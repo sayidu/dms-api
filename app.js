@@ -1,7 +1,7 @@
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-require('dotenv').config()
+//require('dotenv').config();
 //const user = require('./server/routes');
 
 // Set up the express app
@@ -22,5 +22,9 @@ require('./server/routes')(app);
 app.get('*', (req, res) => res.status(200).send({
   message: 'Welcome to our Document Management System.',
 }));
+
+app.listen(8000, function () {
+  console.log('Server Up and Running!');
+});
 
 module.exports = app;

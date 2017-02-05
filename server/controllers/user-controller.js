@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models').User;
-const secret = process.env.JWT_SECRET_TOKEN;
+const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 
 module.exports = {
   create(req, res) {
@@ -12,7 +12,7 @@ module.exports = {
     then((existingUser) => {
       if (existingUser != null) {
         return res.status(409).send({
-          message: 'This email has already been used',
+          message: "A user with this email already exists!",
         });
       }
 
@@ -54,17 +54,27 @@ module.exports = {
       }
     }).
     then((foundUser) => {
-      console.log("Updateme:"+ foundUser.User);
+      if (foundUser === null) {
+        return res.status(204).send({
+          message: "This record does not exists!",
+        });
+      }
+
       User.update({
-           where: {
-             id: req.params.id
-           }
+          firstname: req.body.firstName,
+          lastname: req.body.lastName
+        }, {
+          where: {
+            id: req.params.id
+          }
         })
         .then((updateUser) => {
-            console.log("AboutUpdate" + updateUser);
+          res.status(201).send({
+            message: 'Your details have beeen updated'
+          });
         })
         .catch((err) => {
-            res.status(400).send(err.errors);
+          res.status(400).send(err.errors);
         });
     })
   },
@@ -101,6 +111,11 @@ module.exports = {
         }
       })
       .then((deleteUser) => {
+        if (deleteUser === 0) {
+          return res.status(409).send({
+            message: "This record was not deleted!",
+          });
+        }
         res.status(201).send({
           message: "User deleted",
         })
@@ -109,10 +124,36 @@ module.exports = {
         res.status(400).send(err.errors);
       });
   },
-  login() {
-
+  login(req, res) {
+    User.findOne({
+      where: {
+        email: req.body.email
+      }
+    }).
+    then((existingUser) => {
+        if (existingUser === null) {
+          return res.status(204).send({
+            message: "This record does not exists!",
+          });
+        }
+        if (existingUser.validatePwd(req.body.password) && existingUser) {
+          res.status(200).send({
+            message: 'Password Validated!'
+          })
+        }else{
+          res.status(409).send({
+            message: 'Invalid Password!'
+          })
+        }
+      })
+      .catch((err) => {
+        console.log("errors", err);
+        res.status(400).send(err.errors);
+      });
   },
-  logout() {
-
+  logout(req, res) {
+    res.status(200).send({
+      message: 'You have been logged out successfully!'
+    })
   }
-};
+}
