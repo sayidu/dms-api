@@ -147,7 +147,6 @@ module.exports = {
         }
       })
       .catch((err) => {
-        console.log("errors", err);
         res.status(400).send(err.errors);
       });
   },
