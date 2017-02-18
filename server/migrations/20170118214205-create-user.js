@@ -13,11 +13,11 @@ module.exports = {
         unique: true,
         allowNull: false
       },
-      firstname: {
+      firstName: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      lastname: {
+      lastName: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -37,6 +37,10 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      RoleId: {
+        allowNull: false,
+        type: Sequelize.INTEGER
       }
     });
   },

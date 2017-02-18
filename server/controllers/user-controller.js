@@ -20,11 +20,12 @@ module.exports = {
         .then((user) => {
           const token = jwt.sign({
             UserId: user.id,
+            RoleId: user.RoleId
           }, secret, {
             expiresIn: 86400
           });
 
-          users = {
+          userInfo = {
             id: user.id,
             username: user.username,
             firstName: user.firstName,
@@ -36,10 +37,11 @@ module.exports = {
             RoleId: user.RoleId
           };
 
+          //Get this for storage on the frontend.
           res.status(201).send({
             token,
             expiresIn: 86400,
-            users
+            userInfo
           });
         })
         .catch((err) => {
@@ -81,7 +83,7 @@ module.exports = {
   showUsers(req, res) {
     User.findAll({})
       .then((users) => {
-        res.status(201).send({
+        res.status(200).send({
           users
         });
       })
@@ -140,7 +142,7 @@ module.exports = {
           res.status(200).send({
             message: 'Password Validated!'
           })
-        }else{
+        } else {
           res.status(409).send({
             message: 'Invalid Password!'
           })

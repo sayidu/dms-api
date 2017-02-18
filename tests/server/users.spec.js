@@ -1,59 +1,89 @@
 const request = require('supertest');
 const expect = require('chai').expect;
 const app = require('../../app');
+const models = require('../../server/models');
+const fakeData = require('../fakeData');
+let roleId1, roleId2, adminToken;
 
 describe('User API', function () {
-it('validates that data for all users is accessible', function (done) {
-  request(app)
-    .get('/users/')
-    .set('Accept', 'application/json')
-    .expect(201)
-    .end(function (err, res) {
-      if (err) return done(err);
-      done();
-    });
-});
 
-it('validates that data for specific users is accessible', function (done) {
-  request(app)
-    .get('/users/3')
-    .set('Accept', 'application/json')
-    .expect(201)
-    .end(function (err, res) {
-      expect(res.body.validUser).to.have.property('username');
-      expect(res.body.validUser).to.have.property('id');
-      if (err) return done(err);
-      done();
-    });
-});
+  //Promise chaining, with the return or the done callback();
+  before(function () {
+    return models.Role.create(fakeData.adminRole)
+      .then((roleData) => {
+        roleId1 = roleData.dataValues.id;
+        return models.Role.create(fakeData.regularRole)
+      })
+      .then((roleData) => {
+        roleId2 = roleData.dataValues.id;
+      });
+  });
 
-it('validates that a new user created has both first and last names', function (done) {
-  request(app)
-    .post('/users')
-    .set('Content-Type', 'application/x-www-form-urlencoded')
-    .send({
-      "id": 1,
-      "username": "jdoe",
-      "firstname": "jane",
-      "lastname": "doe",
-      "email": "jane@doe.com",
-      "password": "testUser",
-      "createdAt": "1981-09-20T00:00:00.000Z",
-      "updatedAt": "2017-01-21T14:48:16.775Z",
-      "RoleId": 1
-    })
-    .expect(201)
-    .end(function (err, res) {
-      expect(res.body.users.firstname).to.equals('jane');
-      expect(res.body.users.lastname).to.equals('doe');
-      if (err) return done(err);
-      done();
-    });
-});
-it('validates that a role is defined for a new user', function (done) {
+  //Test that the token is created for the user.
+  //Test that users is returned as part of the payload.
+  it('creates a new user with first and last names', function (done) {;
     request(app)
+      .post('/users')
+      .set('Content-Type', 'application/json')
+      .send(fakeData.firstUser)
+      .expect(201)
+      .end(function (err, res) {
+        adminToken = res.body.token;
+        expect(res.body.userInfo).to.have.property('firstName');
+        expect(res.body.userInfo).to.have.property('lastName');
+        if (err) return done(err);
+        done();
+      });
+  });
 
+  //Rewrite controller to do Password length, and front end validation before the request is run.
+  //Username is checked by database
+  //Email is being check in controller.
+   it('validates that a new user must provide unique details', function (done) {;
+    request(app)
+      .post('/users')
+      .set('Content-Type', 'application/json')
+      .send(fakeData.firstUser)
+      .expect(409)
+      .end(function (err, res) {
+        expect(res.body.message).to.equals('A user with this email already exists!');
+        if (err) return done(err);
+        done();
+      });
+   });
+
+    it('validates that each new user has a role assigned', function (done) {;
+    request(app)
+      .get('/users/1')
+      .set('Content-Type', 'application/json')
+      .expect(201)
+      .end(function (err, res) {
+        expect(res.body.validUser).to.have.property('RoleId');
+        if (err) return done(err);
+        done();
+      });
+   });
+
+  it('validates that all Users are accessible only when requested by admin', function (done) {
+    request(app)
+      .get('/users')
+      .set('Authorization',adminToken)
+      .expect(200)
+      .end(function (err, res) {
+        expect((res.body.users).length).to.equals(1);
+        if (err) return done(err);
+        done();
+      });
+  });
+
+   it('validates that all users are not accessible to non-admins', function (done) {
+    request(app)
+      .get('/users')
+      .expect(401)
+      .end(function (err, res) {
+        expect(res.body.message).to.equal('Please Login!');
+        if (err) return done(err);
+        done();
+      });
+  });
 });
-
-});
-
