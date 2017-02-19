@@ -29,6 +29,7 @@ describe('User API', function () {
       .expect(201)
       .end(function (err, res) {
         adminToken = res.body.token;
+        console.log(adminToken);
         expect(res.body.userInfo).to.have.property('firstName');
         expect(res.body.userInfo).to.have.property('lastName');
         if (err) return done(err);

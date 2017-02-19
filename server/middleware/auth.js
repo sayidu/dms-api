@@ -20,6 +20,7 @@ module.exports = {
               message: 'Invalid Authentication Details'
             });
         }
+        req.decoded = decoded.RoleId;
         return next();
       });
     }

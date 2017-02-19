@@ -9,7 +9,7 @@
   "test": {
     "username": "",
     "password": null,
-    "database": "dms-api",
+    "database": "dmsApi_test",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },

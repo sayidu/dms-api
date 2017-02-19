@@ -1,5 +1,6 @@
 const userController = require('../controllers').User;
 const docController = require('../controllers').Document;
+const roleController = require('../controllers').Role;
 const auth = require('../middleware/auth');
 
 module.exports = (app) => {
@@ -17,15 +18,17 @@ module.exports = (app) => {
 
   app.post('/users/logout', userController.logout);
 
-  app.post('/documents', docController.create);
+  app.post('/documents', auth.isAuthenticated, docController.create);
 
-  app.get('/documents', docController.getDocs);
+  app.get('/documents', auth.isAuthenticated, docController.getDocs);
 
-  app.get('/documents/:id', docController.getADoc);
+  app.get('/documents/:id', auth.isAuthenticated, docController.getADoc);
 
-  app.put('/documents/:id', docController.updateADoc);
+  app.put('/documents/:id', auth.isAuthenticated,  docController.updateADoc);
 
-  app.delete('/documents/:id', docController.deleteADoc);
+  app.delete('/documents/:id',  auth.isAuthenticated, docController.deleteADoc);
 
-  app.get('/users/:id/documents', docController.showMyDocs)
+  app.get('/users/:id/documents',  auth.isAuthenticated, docController.showMyDocs)
+
+  app.post('/roles', auth.isAuthenticated, roleController.create);
 };

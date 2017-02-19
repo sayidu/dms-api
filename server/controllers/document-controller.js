@@ -5,15 +5,17 @@ module.exports = {
     Document.create(req.body)
       .then((doc) => {
         res.status(201).send({
-          message: "Document Created"
+          message: "Document Created",
+          doc: doc
         });
       })
       .catch((err) => {
+        console.log(err);
         res.status(400).send(err.errors);
       });
   },
   getDocs(req, res) {
-    Document.findAll({})
+    Document.findAll({order: [['createdAt', 'DESC']]})
       .then((docs) => {
         res.status(201).send({
           message: docs
@@ -30,9 +32,20 @@ module.exports = {
         }
       })
       .then((doc) => {
-        res.status(201).send({
-          message: doc
-        })
+        const docData = doc.dataValues;
+        if (docData.access  === 'public' || (docData.access === 'private' && docData.ownerId === req.decoded)) {
+          res.status(201).send({
+            message: doc
+          });
+        } else if (docData.access !== 'public' || docData.ownerId !== req.decoded) {
+          res.status(401).send({
+            message: 'Unauthorised to view this document'
+          })
+        } else {
+          res.status(401).send({
+            message: 'I got here'
+          })
+        }
       })
       .catch((err) => {
         res.status(400).send(err.errors);

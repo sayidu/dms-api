@@ -3,7 +3,8 @@
 module.exports = (sequelize, DataTypes) => {
   const Document = sequelize.define('Document', {
     title: DataTypes.STRING,
-    content: DataTypes.STRING
+    content: DataTypes.STRING,
+    access: DataTypes.STRING
   }, {
     classMethods: {
       associate(models) {
