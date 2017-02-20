@@ -26,9 +26,9 @@ module.exports = {
     }
   },
   isAdmin(req, res, next) {
-    db.Role.findById(req.decoded.RoleId)
+    models.Role.findById(req.decoded)
       .then((role) => {
-        if (role.title === 'admin') {
+        if (role.roleTitle === 'admin') {
           next();
         } else {
           return res.status(403).send({

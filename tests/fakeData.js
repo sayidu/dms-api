@@ -7,8 +7,13 @@ module.exports = {
   regularRole: {
     roleTitle: 'regular'
   },
+  testRole: {
+    roleTitle: 'tester'
+  },
+  testRole1: {
+    roleTitle: 'failedTester'
+  },
   firstUser: {
-    id: 1,
     username: faker.internet.userName(),
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
@@ -19,7 +24,6 @@ module.exports = {
     RoleId: 1
   },
   secondUser: {
-    id: 2,
     username: faker.internet.userName(),
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
@@ -30,7 +34,6 @@ module.exports = {
     RoleId: 2
   },
   thirdUser: {
-    id: 3,
     username: faker.internet.userName(),
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
@@ -42,13 +45,13 @@ module.exports = {
   },
   document1: {
     title: faker.name.jobTitle(),
-    content: faker.lorem.paragraph(),
+    content:faker.name.jobTitle(),
     access: 'public',
     ownerId: 1
   },
   document2 :{
     title: faker.name.jobTitle(),
-    content: faker.lorem.paragraph(),
+    content:faker.name.jobTitle(),
     ownerId: 1
   },
    document3 :{

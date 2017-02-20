@@ -30,5 +30,7 @@ module.exports = (app) => {
 
   app.get('/users/:id/documents',  auth.isAuthenticated, docController.showMyDocs)
 
-  app.post('/roles', auth.isAuthenticated, roleController.create);
+  app.get('/roles',auth.isAuthenticated, auth.isAdmin,  roleController.all);
+
+  app.post('/roles', auth.isAuthenticated, auth.isAdmin, roleController.create);
 };

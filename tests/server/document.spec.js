@@ -15,28 +15,41 @@ const expect = require('chai').expect;
 const app = require('../../app');
 const models = require('../../server/models');
 const fakeData = require('../fakeData');
-let authToken, invalidToken, roleId1;
+let authToken, invalidToken, roleId1, roleId2;
 
-//Creation of docs should use a token also.
-
+//Creation of docs should use a token also./
 describe('Document API', function () {
   before((done) => {
-    request(app)
-      .post('/users')
-      .set('Content-Type', 'application/json')
-      .send(fakeData.firstUser)
-      .end(function (err, res) {
-        authToken = res.body.token;
-        if (err) return done(err);
-      });
-    request(app)
-      .post('/users')
-      .set('Content-Type', 'application/json')
-      .send(fakeData.thirdUser)
-      .end(function (err, res) {
-        invalidToken = res.body.token;
-        if (err) return done(err);
-        done();
+    //Admin Created, Role ID, Creates Document 1
+    models.Role.create(fakeData.adminRole)
+      .then((roleData) => {
+        roleId1 = roleData.dataValues.id;
+        fakeData.firstUser.RoleId = roleId1;
+        request(app)
+          .post('/users')
+          .set('Content-Type', 'application/json')
+          .send(fakeData.firstUser)
+          .end(function (err, res) {
+            fakeData.document1.ownerId = res.body.userInfo.id;
+            authToken = res.body.token;
+            if (err) return done(err);
+          });
+      })
+      //regularRole created, creates document 2
+    models.Role.create(fakeData.regularRole)
+      .then((roleData) => {
+        roleId2 = roleData.dataValues.id;
+        fakeData.secondUser.RoleId = roleId2;
+        request(app)
+          .post('/users')
+          .set('Content-Type', 'application/json')
+          .send(fakeData.secondUser)
+          .end(function (err, res) {
+            fakeData.document2.ownerId = res.body.userInfo.id;
+            invalidToken = res.body.token;
+            if (err) return done(err);
+            done();
+          });
       });
   });
 
@@ -107,7 +120,9 @@ describe('Document API', function () {
         done();
       });
   });
-  it('validates ONLY user\’s with the same role as the creator, can access documents with property access set to role.', function (done) {});
+  it('validates ONLY user\’s with the same role as the creator, can access documents with property access set to role.', function (done) {
+
+  });
   it('validates that all documents are returned in order of their published dates, starting from the most recent when Documents.all is called', function (done) {
 
   });
