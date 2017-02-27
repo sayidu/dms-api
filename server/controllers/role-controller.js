@@ -1,5 +1,6 @@
-const Role = require('../models').Role;
+'use strict';
 
+const Role = require('../models').Role;
 
 module.exports = {
   create(req, res) {

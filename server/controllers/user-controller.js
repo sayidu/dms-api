@@ -1,3 +1,5 @@
+'use strict';
+
 const jwt = require('jsonwebtoken');
 const User = require('../models').User;
 const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
@@ -5,48 +7,48 @@ const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 module.exports = {
   create(req, res) {
     User.findOne({
-      where: {
-        email: req.body.email
-      }
-    })
-    .then((existingUser) => {
-      if (existingUser != null) {
-        return res.status(409).send({
-          message: "A user with this email already exists!",
-        });
-      }
-
-      User.create(req.body)
-        .then((user) => {
-          const token = jwt.sign({
-            UserId: user.id
-          }, secret, {
-            expiresIn: 86400
+        where: {
+          email: req.body.email
+        }
+      })
+      .then((existingUser) => {
+        if (existingUser != null) {
+          return res.status(409).send({
+            message: "A user with this email already exists!",
           });
+        }
 
-          userInfo = {
-            id: user.id,
-            username: user.username,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            password: user.password,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt,
-            RoleId: user.RoleId
-          };
+        User.create(req.body)
+          .then((user) => {
+            const token = jwt.sign({
+              UserId: user.id
+            }, secret, {
+              expiresIn: 86400
+            });
 
-          //Get this for storage on the frontend.
-          res.status(201).send({
-            token,
-            expiresIn: 86400,
-            userInfo
+            const userInfo = {
+              id: user.id,
+              username: user.username,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+              password: user.password,
+              createdAt: user.createdAt,
+              updatedAt: user.updatedAt,
+              RoleId: user.RoleId
+            };
+
+            //Get this for storage on the frontend.
+            res.status(201).send({
+              token,
+              expiresIn: 86400,
+              userInfo
+            });
+          })
+          .catch((err) => {
+            res.status(400).send(err.errors);
           });
-        })
-        .catch((err) => {
-          res.status(400).send(err.errors);
-        });
-    });
+      });
   },
   update(req, res) {
     User.findOne({

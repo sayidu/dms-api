@@ -1,3 +1,5 @@
+'use strict';
+
 const expect = require('chai').expect;
 const app = require('../../app');
 const models = require('../../server/models');

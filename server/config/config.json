@@ -2,21 +2,21 @@
   "development": {
     "username": "",
     "password": null,
-    "database": "dms-api",
+    "database": "dmsApi",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {
     "username": "",
     "password": null,
-    "database": "dmsApi_test",
+    "database": "dmsApi",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "production": {
     "username": "",
     "password": null,
-    "database": "dms-api",
+    "database": "dmsApi",
     "host": "127.0.0.1",
     "dialect": "postgres"
   }

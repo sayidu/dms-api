@@ -1,3 +1,5 @@
+'use strict';
+
 const jwt = require('jsonwebtoken');
 const models = require('../models');
 const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
@@ -5,7 +7,7 @@ const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 module.exports = {
   isAuthenticated(req, res, next) {
     const authToken = req.headers['authorization'];
-    console.log(authToken);
+    console.log("Authentication",authToken);
     if (!authToken) {
       return res.status(401).json({
         done: false,

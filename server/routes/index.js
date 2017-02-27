@@ -1,3 +1,5 @@
+'use strict';
+
 const userController = require('../controllers').User;
 const docController = require('../controllers').Document;
 const roleController = require('../controllers').Role;

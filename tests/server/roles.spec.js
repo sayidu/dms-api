@@ -1,10 +1,12 @@
+'use strict';
+
 const request = require('supertest');
 const expect = require('chai').expect;
 const app = require('../../app');
 const _ = require('lodash');
 const models = require('../../server/models');
 const fakeData = require('../fakeData');
-let authToken, invalidToken, roleId1;
+let authToken, invalidToken, roleId1, roleId2;
 
 describe('Role API', function () {
   before((done) => {

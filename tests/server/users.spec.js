@@ -1,3 +1,5 @@
+'use strict';
+
 const request = require('supertest');
 const expect = require('chai').expect;
 const app = require('../../app');
@@ -7,14 +9,15 @@ let roleId1, roleId2, adminToken;
 
 describe('User API', function () {
 
-  before(function () {
-    return models.Role.create(fakeData.adminRole)
+  before(function (done) {
+    models.Role.create(fakeData.adminRole)
       .then((roleData) => {
         roleId1 = roleData.dataValues.id;
-        return models.Role.create(fakeData.regularRole)
-      })
+      });
+   models.Role.create(fakeData.regularRole)
       .then((roleData) => {
         roleId2 = roleData.dataValues.id;
+        done();
       });
   });
 

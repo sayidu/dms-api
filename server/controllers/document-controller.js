@@ -1,3 +1,5 @@
+'use strict';
+
 const Document = require('../models').Document;
 const User = require('../models').User;
 
