@@ -20,7 +20,7 @@ module.exports = (app) => {
 
   app.post('/documents', auth.isAuthenticated, docController.create);
 
-  app.get('/documents', auth.isAuthenticated, docController.getDocs);
+  app.get('/documents', auth.isAuthenticated, docController.getAllDocs);
 
   app.get('/documents/:id', auth.isAuthenticated, docController.getADoc);
 

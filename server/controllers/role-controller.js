@@ -16,7 +16,7 @@ module.exports = {
       })
   },
   all(req,res) {
-    Role.findAll({})
+    Role.findAll()
       .then((roles) => {
          res.status(200).send({
           message: "Roles Found",

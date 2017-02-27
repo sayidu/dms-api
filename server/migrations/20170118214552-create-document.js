@@ -1,6 +1,6 @@
 'use strict';
 module.exports = {
-  up: function(queryInterface, Sequelize) {
+  up: function (queryInterface, Sequelize) {
     return queryInterface.createTable('Documents', {
       id: {
         allowNull: false,
@@ -16,13 +16,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      access:{
+      access: {
         type: Sequelize.STRING,
         defaultValue: 'public',
-        allowNull: false,
-        validate: {
-           isIn: [['public', 'private', 'role']],
-        }
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
@@ -38,7 +35,7 @@ module.exports = {
       }
     });
   },
-  down: function(queryInterface, Sequelize) {
+  down: function (queryInterface, Sequelize) {
     return queryInterface.dropTable('Documents');
   }
 };

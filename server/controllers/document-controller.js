@@ -1,4 +1,5 @@
 const Document = require('../models').Document;
+const User = require('../models').User;
 
 module.exports = {
   create(req, res) {
@@ -10,15 +11,20 @@ module.exports = {
         });
       })
       .catch((err) => {
-        console.log(err);
         res.status(400).send(err.errors);
       });
   },
-  getDocs(req, res) {
-    Document.findAll({order: [['createdAt', 'DESC']]})
+  getAllDocs(req, res) {
+    let query = {};
+    query.order = [['createdAt', 'DESC']];
+
+    if(req.query.limit) query.limit = req.query.limit;
+    if(req.query.offset) query.offset =(req.query.offset - 1) * 10;
+
+    Document.findAll(query)
       .then((docs) => {
         res.status(201).send({
-          message: docs
+           docs
         })
       })
       .catch((err) => {
@@ -33,18 +39,34 @@ module.exports = {
       })
       .then((doc) => {
         const docData = doc.dataValues;
-        if (docData.access  === 'public' || (docData.access === 'private' && docData.ownerId === req.decoded)) {
+        if (docData.access === 'public' || (docData.access === 'private' && docData.ownerId === req.decoded.UserId)) {
           res.status(201).send({
             message: doc
           });
-        } else if (docData.access !== 'public' || docData.ownerId !== req.decoded) {
+        }
+        if (docData.access === 'private' && docData.ownerId !== req.decoded.UserId) {
           res.status(401).send({
             message: 'Unauthorised to view this document'
           })
-        } else {
-          res.status(401).send({
-            message: 'I got here'
-          })
+        }
+        if (docData.access === 'role') {
+          User.find({
+              where: {
+                id: docData.ownerId
+              }
+            })
+            .then((foundUser) => {
+              if (foundUser.RoleId === req.decoded.RoleId) {
+                res.status(201).send({
+                  message: doc
+                })
+              } else {
+                res.status(403)
+                  .send({
+                    message: 'Unauthorised to view this document'
+                  });
+              }
+            });
         }
       })
       .catch((err) => {

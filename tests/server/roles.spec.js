@@ -41,6 +41,14 @@ describe('Role API', function () {
       });
   });
 
+  after((done) => {
+    models.sequelize.sync({
+        force: true
+      })
+      .then(() => {
+        done();
+      });
+  });
 
   it('Admin can create a new role that has a unique title', function (done) {
     request(app)
@@ -55,7 +63,7 @@ describe('Role API', function () {
       });
   });
 
-it('Admin can create a new role that does not title', function (done) {
+  it('Admin can create a new role that does not title', function (done) {
     request(app)
       .post('/roles')
       .set('Authorization', authToken)

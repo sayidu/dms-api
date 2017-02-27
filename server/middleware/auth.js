@@ -5,12 +5,12 @@ const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 module.exports = {
   isAuthenticated(req, res, next) {
     const authToken = req.headers['authorization'];
+    console.log(authToken);
     if (!authToken) {
       return res.status(401).json({
         done: false,
         message: 'Please Login!'
       });
-      //Redirect to SignUp:  res.redirect('/');
     } else if (authToken) {
       jwt.verify(authToken, secret, function (err, decoded) {
         if (err) {
@@ -20,21 +20,24 @@ module.exports = {
               message: 'Invalid Authentication Details'
             });
         }
-        req.decoded = decoded.RoleId;
+        req.decoded = decoded;
         return next();
       });
     }
   },
   isAdmin(req, res, next) {
-    models.Role.findById(req.decoded)
-      .then((role) => {
-        if (role.roleTitle === 'admin') {
-          next();
-        } else {
-          return res.status(403).send({
-            message: 'Unauthorised User'
+    models.User.findById(req.decoded.UserId)
+      .then((user) => {
+        models.Role.findById(user.RoleId)
+          .then((role) => {
+            if (role.dataValues.roleTitle === 'admin') {
+              next();
+            } else {
+              return res.status(403).send({
+                message: 'Unauthorised User'
+              });
+            }
           });
-        }
       });
   }
 };

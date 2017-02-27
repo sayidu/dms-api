@@ -7,7 +7,6 @@ let roleId1, roleId2, adminToken;
 
 describe('User API', function () {
 
-  //Promise chaining, with the return or the done callback();
   before(function () {
     return models.Role.create(fakeData.adminRole)
       .then((roleData) => {
@@ -19,8 +18,15 @@ describe('User API', function () {
       });
   });
 
-  //Test that the token is created for the user.
-  //Test that users is returned as part of the payload.
+  after((done) => {
+    models.sequelize.sync({
+        force: true
+      })
+      .then(() => {
+        done();
+      });
+  });
+
   it('creates a new user with first and last names', function (done) {;
     request(app)
       .post('/users')
@@ -29,7 +35,7 @@ describe('User API', function () {
       .expect(201)
       .end(function (err, res) {
         adminToken = res.body.token;
-        console.log(adminToken);
+        expect(res.body.token).to.exist;
         expect(res.body.userInfo).to.have.property('firstName');
         expect(res.body.userInfo).to.have.property('lastName');
         if (err) return done(err);
@@ -37,9 +43,6 @@ describe('User API', function () {
       });
   });
 
-  //Rewrite controller to do Password length, and front end validation before the request is run.
-  //Username is checked by database
-  //Email is being check in controller.
    it('validates that a new user must provide unique details', function (done) {;
     request(app)
       .post('/users')

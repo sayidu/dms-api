@@ -8,8 +8,8 @@ module.exports = {
       where: {
         email: req.body.email
       }
-    }).
-    then((existingUser) => {
+    })
+    .then((existingUser) => {
       if (existingUser != null) {
         return res.status(409).send({
           message: "A user with this email already exists!",
@@ -19,8 +19,7 @@ module.exports = {
       User.create(req.body)
         .then((user) => {
           const token = jwt.sign({
-            UserId: user.id,
-            RoleId: user.RoleId
+            UserId: user.id
           }, secret, {
             expiresIn: 86400
           });
@@ -63,8 +62,8 @@ module.exports = {
       }
 
       User.update({
-          firstname: req.body.firstName,
-          lastname: req.body.lastName
+          firstName: req.body.firstName,
+          lastName: req.body.lastName
         }, {
           where: {
             id: req.params.id
@@ -81,7 +80,7 @@ module.exports = {
     })
   },
   showUsers(req, res) {
-    User.findAll({})
+    User.findAll()
       .then((users) => {
         res.status(200).send({
           users
