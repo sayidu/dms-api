@@ -35,10 +35,9 @@ module.exports = {
               password: user.password,
               createdAt: user.createdAt,
               updatedAt: user.updatedAt,
-              RoleId: user.RoleId
+              roleId: user.roleId
             };
 
-            //Get this for storage on the frontend.
             res.status(201).send({
               token,
               expiresIn: 86400,
@@ -51,6 +50,8 @@ module.exports = {
       });
   },
   update(req, res) {
+    let updateFields = {};
+
     User.findOne({
       where: {
         id: req.params.id
@@ -58,15 +59,20 @@ module.exports = {
     }).
     then((foundUser) => {
       if (foundUser === null) {
-        return res.status(204).send({
-          message: "This record does not exists!",
+        return res.status(200).send({
+          message: 'This record does not exists!',
         });
       }
 
-      User.update({
-          firstName: req.body.firstName,
-          lastName: req.body.lastName
-        }, {
+      if (req.body.firstName) {
+        updateFields.firstName = req.body.firstName;
+      }
+
+      if (req.body.lastName) {
+        updateFields.lastName = req.body.lastName;
+      }
+
+      User.update(updateFields, {
           where: {
             id: req.params.id
           }
@@ -77,7 +83,9 @@ module.exports = {
           });
         })
         .catch((err) => {
-          res.status(400).send(err.errors);
+          res.status(400).send({
+            message: 'Only first and last name fields can updated'
+          });
         });
     })
   },
@@ -115,7 +123,7 @@ module.exports = {
       })
       .then((deleteUser) => {
         if (deleteUser === 0) {
-          return res.status(409).send({
+          return res.status(200).send({
             message: "This record was not deleted!",
           });
         }
@@ -135,16 +143,16 @@ module.exports = {
     }).
     then((existingUser) => {
         if (existingUser === null) {
-          return res.status(204).send({
+          return res.status(200).send({
             message: "This record does not exists!",
           });
         }
         if (existingUser.validatePwd(req.body.password) && existingUser) {
           res.status(200).send({
-            message: 'Password Validated!'
+            message: 'Welcome to the Document Management System'
           })
         } else {
-          res.status(409).send({
+          res.status(401).send({
             message: 'Invalid Password!'
           })
         }

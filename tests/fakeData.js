@@ -23,9 +23,7 @@ module.exports = {
     lastName: 'Doe',
     email: 'jane_doe@gmail.com',
     password: 'shalomRocks',
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
-    RoleId: 1
+    roleId: 1
   },
   secondUser: {
     username: faker.internet.userName(),
@@ -35,7 +33,7 @@ module.exports = {
     password: faker.internet.password(),
     createdAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
-    RoleId: 2
+    roleId: 2
   },
   thirdUser: {
     username: faker.internet.userName(),
@@ -45,14 +43,14 @@ module.exports = {
     password: faker.internet.password(),
     createdAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
-    RoleId: 3
+    roleId: 3
   },
   invalidUser: {
     username: faker.internet.userName(),
     lastName: faker.name.lastName(),
     email: faker.internet.email(),
     password: faker.internet.password(),
-    RoleId: 2
+    roleId: 2
   },
   invalidUser2: {
     username: faker.internet.userName(),
@@ -62,7 +60,7 @@ module.exports = {
     password: faker.internet.password(),
     createdAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
-    RoleId: 2
+    roleId: 2
   },
   document1: {
     title: faker.name.jobTitle(),
@@ -74,12 +72,14 @@ module.exports = {
     content: faker.name.jobTitle()
   },
   document3: {
+    id: 38,
     title: 'History',
     content: 'The history is made!!.',
     access: 'private',
     ownerId: 2
   },
   document4: {
+    id: 40,
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
     access: 'role',

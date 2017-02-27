@@ -7,7 +7,6 @@ const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 module.exports = {
   isAuthenticated(req, res, next) {
     const authToken = req.headers['authorization'];
-    console.log("Authentication",authToken);
     if (!authToken) {
       return res.status(401).json({
         done: false,
@@ -30,7 +29,7 @@ module.exports = {
   isAdmin(req, res, next) {
     models.User.findById(req.decoded.UserId)
       .then((user) => {
-        models.Role.findById(user.RoleId)
+        models.Role.findById(user.roleId)
           .then((role) => {
             if (role.dataValues.roleTitle === 'admin') {
               next();

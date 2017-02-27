@@ -8,13 +8,13 @@ const models = require('../../server/models');
 const fakeData = require('../fakeData');
 let authToken, invalidToken, roleId1, roleId2;
 
-describe('Role API', function () {
+describe('Role API', (done) => {
   before((done) => {
     //Admin Created, Role ID, Creates Document 1
     models.Role.create(fakeData.adminRole)
       .then((roleData) => {
         roleId1 = roleData.dataValues.id;
-        fakeData.firstUser.RoleId = roleId1;
+        fakeData.firstUser.roleId = roleId1;
         request(app)
           .post('/users')
           .set('Content-Type', 'application/json')
@@ -29,7 +29,7 @@ describe('Role API', function () {
     models.Role.create(fakeData.regularRole)
       .then((roleData) => {
         roleId2 = roleData.dataValues.id;
-        fakeData.secondUser.RoleId = roleId2;
+        fakeData.secondUser.roleId = roleId2;
         request(app)
           .post('/users')
           .set('Content-Type', 'application/json')
@@ -52,7 +52,7 @@ describe('Role API', function () {
       });
   });
 
-  it('Admin can create a new role that has a unique title', function (done) {
+  it('Admin can create a new role that has a unique title', (done) => {
     request(app)
       .post('/roles')
       .set('Authorization', authToken)
@@ -65,7 +65,7 @@ describe('Role API', function () {
       });
   });
 
-  it('Admin can create a new role that does not title', function (done) {
+  it('Admin can create a new role that does not title', (done) => {
     request(app)
       .post('/roles')
       .set('Authorization', authToken)
@@ -78,7 +78,7 @@ describe('Role API', function () {
       });
   });
 
-  it('Non-admin can not create a new role that has a unique title', function (done) {
+  it('Non-admin can not create a new role that has a unique title', (done) => {
     request(app)
       .post('/roles')
       .set('Authorization', invalidToken)
@@ -91,7 +91,7 @@ describe('Role API', function () {
       });
   });
 
-  it('retrieve all roles when Roles.all is called', function (done) {
+  it('retrieve all roles when Roles.all is called by an admin', (done) => {
     request(app)
       .get('/roles')
       .set('Authorization', authToken)
@@ -104,7 +104,19 @@ describe('Role API', function () {
       });
   });
 
-  it('validates that at least, “admin” and “regular” roles exist', function (done) {
+  it('roles can not be viewed by regular users', (done) => {
+    request(app)
+      .get('/roles')
+      .set('Authorization', invalidToken)
+      .expect(403)
+      .end(function (err, res) {
+        expect(res.body.message).to.equals('Unauthorised User');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('validates that at least, “admin” and “regular” roles exist', (done) => {
     request(app)
       .get('/roles')
       .set('Authorization', authToken)

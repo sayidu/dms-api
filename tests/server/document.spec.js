@@ -14,7 +14,7 @@ describe('Document API', function () {
     models.Role.create(fakeData.adminRole)
       .then((roleData) => {
         roleId1 = roleData.dataValues.id;
-        fakeData.firstUser.RoleId = roleId1;
+        fakeData.firstUser.roleId = roleId1;
         request(app)
           .post('/users')
           .set('Content-Type', 'application/json')
@@ -29,13 +29,14 @@ describe('Document API', function () {
     models.Role.create(fakeData.regularRole)
       .then((roleData) => {
         roleId2 = roleData.dataValues.id;
-        fakeData.secondUser.RoleId = roleId2;
+        fakeData.secondUser.roleId = roleId2;
         request(app)
           .post('/users')
           .set('Content-Type', 'application/json')
           .send(fakeData.secondUser)
           .end(function (err, res) {
             fakeData.document2.ownerId = res.body.userInfo.id;
+            fakeData.document3.ownerId = res.body.userInfo.id;
             invalidToken = res.body.token;
             models.Document.bulkCreate(fakeData.bulkDocuments);
             if (err) return done(err);
@@ -65,7 +66,7 @@ describe('Document API', function () {
       });
   });
 
-  it('validates that a new User Document created has a published date defined', function (done) {
+  it('validates that a new User Document created has a published date defined', (done) => {
     request(app)
       .post('/documents')
       .set('Authorization', authToken)
@@ -79,7 +80,7 @@ describe('Document API', function () {
       });
   });
 
-  it('validates a document has a property “access” set as “public” by default.', function (done) {
+  it('validates a document has a property “access” set as “public” by default.', (done) => {
     request(app)
       .post('/documents')
       .set('Authorization', authToken)
@@ -94,7 +95,33 @@ describe('Document API', function () {
       });
   });
 
-  it('validate creation of private documents', function (done) {
+  it('only document with all the required fields: title, content, ownerId are created', (done) => {
+    request(app)
+      .post('/documents')
+      .set('Authorization', invalidToken)
+      .send(fakeData.invalidDoc)
+      .expect(400)
+      .end(function (err, res) {
+        expect(res.body.message).to.equals('Please complete all required fields');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+   it('validates that a user can update title and content details for their document', (done) => {
+    request(app)
+      .put('/documents/1')
+      .set('Authorization', authToken)
+      .send({title: 'The Right Database'})
+      .expect(201)
+      .end(function (err, res) {
+        expect(res.body.message).to.equals('Your doc has been updated');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+ it('validate creation of private documents', (done) => {
     request(app)
       .post('/documents')
       .set('Authorization', invalidToken)
@@ -109,10 +136,10 @@ describe('Document API', function () {
       });
   });
 
-  it('validates ONLY the creator of a document can retrieve a file with “\access\” set as “\private\”', function (done) {
+  it('validates ONLY the creator of a document can retrieve a file with “\access\” set as “\private\”', (done) => {
     request(app)
-      .get('/documents/22')
-      .set('Authorization', authToken)
+      .get('/documents/38')
+      .set('Authorization', thirdToken)
       .expect(401)
       .end(function (err, res) {
         expect(res.body.message).to.have.equals('Unauthorised to view this document');
@@ -121,20 +148,21 @@ describe('Document API', function () {
       });
   });
 
-  it('validates ONLY the creator of a document can retrieve a file with “\access\” set as “\private\”', function (done) {
+  it('validates the creator of a document can access it even when the doc is private ', (done) => {
     request(app)
-      .get('/documents/22')
+      .get('/documents/38')
       .set('Authorization', invalidToken)
       .expect(201)
       .end(function (err, res) {
-        expect(res.body.message.id).to.have.equals(22);
+        expect(res.body.message.id).to.have.equals(38);
         expect(res.body.message).to.have.property('access');
         if (err) return done(err);
         done();
       });
   });
 
-  it('creates a document with access set to role', function (done) {
+  it('creates a document with access set to role', (done) => {
+    fakeData.document4.ownerId = roleId2;
     request(app)
       .post('/documents')
       .set('Authorization', invalidToken)
@@ -149,9 +177,9 @@ describe('Document API', function () {
       });
   });
 
-  it('only users with the same role can access the document', function (done) {
+  it('only users with the same role can access the document', (done) => {
     request(app)
-      .get('/documents/23')
+      .get('/documents/40')
       .set('Authorization', thirdToken)
       .expect(403)
       .end(function (err, res) {
@@ -161,7 +189,7 @@ describe('Document API', function () {
       });
   });
 
-  it('validates that all documents are returned in order of their published dates', function (done) {
+  it('validates that all documents are returned in order of their published dates', (done) => {
     request(app)
       .get('/documents')
       .set('Authorization', authToken)
@@ -174,7 +202,7 @@ describe('Document API', function () {
       });
   });
 
-  it('validates that offset is applied when fetching all the pages', function (done) {
+  it('validates that offset is applied when fetching all the pages', (done) => {
     request(app)
       .get('/documents?limit=5')
       .set('Authorization', authToken)
@@ -185,19 +213,21 @@ describe('Document API', function () {
         done();
       });
   });
-  it('validates that offset and limit applied when fetching all the pages', function (done) {
+
+  it('validates that offset and limit applied when fetching all the pages', (done) => {
     request(app)
-      .get('/documents?limit=10&offset=2')
+      .get('/documents?limit=10&offset=1')
       .set('Authorization', authToken)
       .expect(201)
       .end(function (err, res) {
-        expect(res.body.docs[5].id).to.exist;
+        expect(res.body.docs[1].id).to.exist;
         expect((res.body.docs).length).to.equals(10);
         if (err) return done(err);
         done();
       });
   });
-  it('validates that if a user is an admin all documents are made available', function (done) {
+
+  it('validates that if a user is an admin all documents are made available', (done) => {
     request(app)
       .get('/documents')
       .set('Authorization', authToken)

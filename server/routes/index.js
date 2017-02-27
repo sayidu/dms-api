@@ -6,7 +6,7 @@ const roleController = require('../controllers').Role;
 const auth = require('../middleware/auth');
 
 module.exports = (app) => {
-  app.get('/users', auth.isAuthenticated, userController.showUsers);
+  app.get('/users', auth.isAuthenticated, auth.isAdmin, userController.showUsers);
 
   app.get('/users/:id', userController.findaUser);
 
@@ -18,7 +18,7 @@ module.exports = (app) => {
 
   app.post('/users/login', userController.login);
 
-  app.post('/users/logout', userController.logout);
+  app.post('/users/logout',  auth.isAuthenticated, userController.logout);
 
   app.post('/documents', auth.isAuthenticated, docController.create);
 

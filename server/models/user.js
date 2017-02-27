@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    RoleId: {
+    roleId: {
       allowNull: false,
       type: DataTypes.INTEGER
     }
@@ -35,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       associate(models) {
         User.belongsTo(models.Role, {
           foreignKey: {
+            name: 'roleId',
             allowNull: false
           },
           onDelete: 'CASCADE'
