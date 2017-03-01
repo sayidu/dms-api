@@ -14,14 +14,7 @@ describe("Model for User Table", () => {
       });
   });
 
-  after((done) => {
-    models.sequelize.sync({
-        force: true
-      })
-      .then(() => {
-        done();
-      });
-  });
+  after(() => models.User.sequelize.sync({ force: true }));
 
   it('creates a new user', (done) => {
     models.User.create(fakeData.firstUser)

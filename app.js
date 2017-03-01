@@ -1,6 +1,7 @@
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
+const port = process.env.PORT || 8000;
 //require('dotenv').config();
 //const user = require('./server/routes');
 
@@ -19,11 +20,11 @@ require('./server/routes')(app);
 
 
 // Setup a default catch-all route that sends back a welcome message in JSON format.
-app.get('*', (req, res) => res.status(200).send({
+app.get('/', (req, res) => res.status(200).send({
   message: 'Welcome to our Document Management System.',
 }));
 
-app.listen(8000, function () {
+app.listen(port, function () {
   console.log('Server Up and Running!');
 });
 

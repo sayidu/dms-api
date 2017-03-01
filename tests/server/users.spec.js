@@ -21,14 +21,7 @@ describe('User API', () => {
       });
   });
 
-  after((done) => {
-    models.sequelize.sync({
-        force: true
-      })
-      .then(() => {
-        done();
-      });
-  });
+  after(() => models.User.sequelize.sync({ force: true }));
 
   it('creates a new user with first and last names', (done) => {
     request(app)
@@ -128,7 +121,7 @@ describe('User API', () => {
         firstName: 'chicken',
         lastName: 'michelin'
       })
-      .expect(200)
+      .expect(404)
       .end(function (err, res) {
         expect(res.body.message).to.equals('This record does not exists!');
         if (err) return done(err);

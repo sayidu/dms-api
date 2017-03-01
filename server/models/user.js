@@ -1,6 +1,6 @@
 'use strict';
 
-const bCrypt = require('bcrypt-nodejs');
+import bCrypt from 'bcrypt-nodejs';
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
@@ -34,8 +34,8 @@ module.exports = (sequelize, DataTypes) => {
     classMethods: {
       associate(models) {
         User.belongsTo(models.Role, {
+          as: 'role',
           foreignKey: {
-            name: 'roleId',
             allowNull: false
           },
           onDelete: 'CASCADE'
@@ -43,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {
         User.hasMany(models.Document, {
           foreignKey: {
             name: 'ownerId',
-            allowNull: false,
+            allowNull: false
           },
           onDelete: 'CASCADE'
         });

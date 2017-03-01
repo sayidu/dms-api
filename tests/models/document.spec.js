@@ -8,29 +8,18 @@ const fakeData = require('../fakeData');
 
 
 describe("Model for Document Table", () => {
-  before((done) => {
-    models.Role.create(fakeData.adminRole)
+  before(() => {
+   return models.Role.create(fakeData.adminRole)
       .then((role) => {
         fakeData.firstUser.roleId = role.dataValues.id;
-        models.User.create(fakeData.firstUser)
-          .then((user) => {
-            fakeData.document3.ownerId = user.dataValues.id;
-            done();
-          });
+        return models.User.create(fakeData.firstUser)
       })
-      .catch((done) => {
-        done();
+      .then((user) => {
+        fakeData.document3.ownerId = user.dataValues.id;
       });
   });
 
-  after((done) => {
-    models.sequelize.sync({
-        force: true
-      })
-      .then(() => {
-        done();
-      });
-  });
+after(() => models.Document.sequelize.sync({ force: true }));
 
   it('validates Document creation with valid details', (done) => {
     models.Document.create(fakeData.document3)

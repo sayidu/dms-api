@@ -1,7 +1,11 @@
 'use strict';
 
-const jwt = require('jsonwebtoken');
-const models = require('../models');
+import jwt from 'jsonwebtoken';
+import {
+  Document,
+  User,
+  Role
+} from '../models';
 const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 
 module.exports = {
@@ -27,9 +31,9 @@ module.exports = {
     }
   },
   isAdmin(req, res, next) {
-    models.User.findById(req.decoded.UserId)
+    User.findById(req.decoded.UserId)
       .then((user) => {
-        models.Role.findById(user.roleId)
+        Role.findById(user.roleId)
           .then((role) => {
             if (role.dataValues.roleTitle === 'admin') {
               next();

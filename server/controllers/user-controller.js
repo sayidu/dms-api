@@ -1,10 +1,19 @@
 'use strict';
 
-const jwt = require('jsonwebtoken');
-const User = require('../models').User;
+import jwt from 'jsonwebtoken';
+import {
+  User,
+} from '../models';
 const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 
 module.exports = {
+  /**
+   * Creates a user
+   * Route: POST: /users
+   * @param {Object} req request object
+   * @param {Object} res response object
+   * @returns {void}
+   */
   create(req, res) {
     User.findOne({
         where: {
@@ -21,7 +30,8 @@ module.exports = {
         User.create(req.body)
           .then((user) => {
             const token = jwt.sign({
-              UserId: user.id
+              UserId: user.id,
+              RoleId: user.roleId,
             }, secret, {
               expiresIn: 86400
             });
@@ -49,6 +59,13 @@ module.exports = {
           });
       });
   },
+  /**
+   * updates a user's details
+   * Route: UPDATE: /users/:id
+   * @param {Object} req request object
+   * @param {Object} res response object
+   * @returns {void|Object}
+   */
   update(req, res) {
     let updateFields = {};
 
@@ -59,7 +76,7 @@ module.exports = {
     }).
     then((foundUser) => {
       if (foundUser === null) {
-        return res.status(200).send({
+        return res.status(404).send({
           message: 'This record does not exists!',
         });
       }
@@ -81,23 +98,22 @@ module.exports = {
           res.status(201).send({
             message: 'Your details have beeen updated'
           });
-        })
-        .catch((err) => {
-          res.status(400).send({
-            message: 'Only first and last name fields can updated'
-          });
         });
-    })
+    });
   },
+  /**
+   * gets all user's details
+   * Route: UPDATE: /users/:id
+   * @param {Object} req request object
+   * @param {Object} res response object
+   * @returns {void}
+   */
   showUsers(req, res) {
     User.findAll()
       .then((users) => {
         res.status(200).send({
           users
         });
-      })
-      .catch((err) => {
-        res.status(400).send(err);
       });
   },
   findaUser(req, res) {
@@ -110,9 +126,6 @@ module.exports = {
         res.status(201).send({
           validUser
         })
-      })
-      .catch((err) => {
-        res.status(400).send(err.errors);
       });
   },
   delete(req, res) {
@@ -130,9 +143,6 @@ module.exports = {
         res.status(201).send({
           message: "User deleted",
         })
-      })
-      .catch((err) => {
-        res.status(400).send(err.errors);
       });
   },
   login(req, res) {
@@ -142,24 +152,21 @@ module.exports = {
       }
     }).
     then((existingUser) => {
-        if (existingUser === null) {
-          return res.status(200).send({
-            message: "This record does not exists!",
-          });
-        }
-        if (existingUser.validatePwd(req.body.password) && existingUser) {
-          res.status(200).send({
-            message: 'Welcome to the Document Management System'
-          })
-        } else {
-          res.status(401).send({
-            message: 'Invalid Password!'
-          })
-        }
-      })
-      .catch((err) => {
-        res.status(400).send(err.errors);
-      });
+      if (existingUser === null) {
+        return res.status(200).send({
+          message: "This record does not exists!",
+        });
+      }
+      if (existingUser.validatePwd(req.body.password) && existingUser) {
+        res.status(200).send({
+          message: 'Welcome to the Document Management System'
+        })
+      } else {
+        res.status(401).send({
+          message: 'Invalid Password!'
+        })
+      }
+    });
   },
   logout(req, res) {
     res.status(200).send({

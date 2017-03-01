@@ -6,14 +6,7 @@ const models = require('../../server/models');
 const fakeData = require('../fakeData');
 
 describe("Model for Role Table", () => {
-   after((done) => {
-        models.sequelize.sync({
-                force: true
-            })
-            .then(() => {
-                done();
-            });
-    });
+ after(() => models.Role.sequelize.sync({ force: true }));
 
   it('creates a new role', (done) => {
     models.Role.create(fakeData.adminRole)

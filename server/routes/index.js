@@ -24,6 +24,8 @@ module.exports = (app) => {
 
   app.get('/documents', auth.isAuthenticated, docController.getAllDocs);
 
+  app.get('/search', auth.isAuthenticated, docController.searchDocs);
+
   app.get('/documents/:id', auth.isAuthenticated, docController.getADoc);
 
   app.put('/documents/:id', auth.isAuthenticated,  docController.updateADoc);
@@ -32,7 +34,11 @@ module.exports = (app) => {
 
   app.get('/users/:id/documents',  auth.isAuthenticated, docController.showMyDocs)
 
+  app.post('/roles',auth.isAuthenticated, auth.isAdmin,  roleController.create);
+
   app.get('/roles',auth.isAuthenticated, auth.isAdmin,  roleController.all);
 
-  app.post('/roles', auth.isAuthenticated, auth.isAdmin, roleController.create);
+  app.put('/roles/:id', auth.isAuthenticated, auth.isAdmin,  roleController.update);
+
+  app.delete('/roles/:id', auth.isAuthenticated, auth.isAdmin,  roleController.delete);
 };

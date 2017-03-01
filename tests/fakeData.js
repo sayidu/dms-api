@@ -99,92 +99,66 @@ module.exports = {
   bulkDocuments: [{
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
     access: 'private',
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
     access: 'role',
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 1
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 1
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'private',
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 1
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'private',
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 1
   }, {
@@ -195,36 +169,26 @@ module.exports = {
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'private',
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'public',
     ownerId: 1
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'private',
     ownerId: 2
   }, {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    createdAt: faker.date.recent(),
-    updatedAt: faker.date.recent(),
     access: 'private',
     ownerId: 2
   }]
