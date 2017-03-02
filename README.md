@@ -1,14 +1,13 @@
 **TravisCI**
 [![Coverage Status](https://coveralls.io/repos/github/andela-sayidu/dms-api/badge.svg?branch=dev)](https://coveralls.io/github/andela-sayidu/dms-api?branch=dev)
 **Codeclimate**
-# Document Managemet System
+# Document Management System
 Document Management System API contains API endpoints which allows users to create, edit, retrieve and delete documents.
-It also offers a way to ensure that only authorized users can perform certain operations.
 
 Development
 -----------
 The application was developed with [NodeJs](http://nodejs.org) while using [Express](http://expressjs.com) for routing.
- The [Postgres](http://postgresql.com) database was used with [sequelize](http://sequelizejs.com) as the ORM
+ The [Postgres](http://postgresql.com) database was used with [sequelize](http://sequelizejs.com) as the ORM.
 
 Installation
 ------------
@@ -17,9 +16,13 @@ Installation
 3.  Change your directory `cd dms-api`
 4.  Install all dependencies `npm install`
 5.  Run tests  `npm test`
-6.  Start the app `npm start` and use [postman](https://www.getpostman.com/) to consume the API
+6.  Start the app `npm start` and use the [postman collection](https://www.getpostman.com/collections/16cbaed248038069a004) to consume the API
 
 ## API ENDPOINTS
+Access for the endpoints are restricted based on the Authorization token assigned to the user.
+Users are assigned a token on creation and login to the system, this token is therefore used
+to authorise access to the API endpoints.
+
 **Users**
 
 Request type | Endpoint | Action
@@ -36,22 +39,22 @@ POST | [/users/logout](#logout) | Log a user out
 
 Request type | Endpoint | Action
 ------------ | -------- | ------
-POST | [/roles/create](#create-role) | Create a new role
+POST | [/roles](#create-a-role) | Create a new role
 GET | [/roles](#get-roles) | Get all created roles
-PUT | [/roles/:id](#create-role) | Update a new role
-DELETE | [/users/:id](#delete-user) | Delete a role
+PUT | [/roles/:id](#update-a-role) | Update a new role
+DELETE | [/roles/:id](#delete-a-role) | Delete a role
 
 **Documents**
 
 Request type | Endpoint | Action
 ------------ | -------- | ------
-POST | [/documents](#create-document) | Create a new document
+POST | [/documents](#create-a-document) | Create a new document
 GET | [/documents](#get-documents) | Retrieve all documents
 GET | [/documents/:id](#get-a-document) | Retrieve a specific document
 GET | [/users/:id/documents](#get-documents-by-user) | Retrieve all documents created by a user
 GET | [/documents?offset=1&limit=10](#get-documents) | Retrieve maximum of first 10 documents
-PUT | [/documents/:id](#update-document) | Update a specific document
-DELETE | [/documents/:id](#delete-document) | Remove a specific document from storage
+PUT | [/documents/:id](#update-a-document) | Update a specific document
+DELETE | [/documents/:id](#delete-a-document) | Delete a specific document
 
 Users
 -----
@@ -59,6 +62,7 @@ Users
 ## Create Users
 To create a new user, make a **POST** request to `/users`
 #### Request
+  - Endpoint: **POST**: `/users`
 ```
 {
   "id: 1,
@@ -138,16 +142,15 @@ Get details for a specific user.
 
 ## Update user
 #### Request
-  - Enpoint: **PUT**: `/users/:id`
+  - Endpoint: **PUT**: `/users/:id`
   - Requires `Authorization` header to be set
 ```
 {
-  {
      "firstName": "Doctor",
      "lastName": "Strange",
-  }
 }
 ```
+
 #### Mock Response
 Body (application/json)
 ```
@@ -165,7 +168,7 @@ Body (application/json)
 
 ## Delete user
 #### Request
-  - Enpoint: **DELETE**: `/users/:id`
+  - Endpoint: **DELETE**: `/users/:id`
   - Requires `Authorization` header to be set
 #### Mock Response
 Body (application/json)
@@ -197,7 +200,7 @@ Body (application/json)
 
 ## Logout
 #### Request
-  - Enpoint: **POST**: `/users/logout`
+  - Endpoint: **POST**: `/users/logout`
   - Requires `Authorization` header to be set
 
 #### Mock Response
@@ -210,9 +213,9 @@ Body (application/json)
 
 ROLES
 -----
-## Create Role
+## Create a Role
 #### Request
-  - Endpoint **POST** `/roles/create`
+  - Endpoint: **POST** `/roles`
   - Requires `Authorization` header to be set
 Body (application/json)
 ```
@@ -224,14 +227,16 @@ Body (application/json)
 Body (application/json)
 ```
 {
-  status: 200,
-  message: 'Successfully created'
+  message: 'New Role Created',
+  {
+  "roleTitle": "admin"
+  }
 }
 ```
 
 ## Get Roles
 #### Request
-  - Endpoint **GET** `/roles`
+  - Endpoint: **GET** `/roles`
   - Requires `Authorization` header to be set
 
 #### Mock Response
@@ -245,39 +250,67 @@ Body (application/json)
     },
     {
       "id": 1,
-      "rowTitle": "regular",
+      "roleTitle": "regular",
       "createdAt": "2016-13-06T09:25:29.316Z",
       "updatedAt": "2016-13-06T09:25:29.316Z"
     }
 ]
 ```
 
+## Update a Role
+#### Request
+  - Endpoint: **PUT**: `/roles/:id`
+  - Requires `Authorization` header to be set
+#### Mock Response
+Body (application/json)
+```
+  {
+    message: 'Successfully Updated.'
+  }
+```
+
+## Delete a Role
+#### Request
+  - Endpoint: **DELETE**: `/roles/:id`
+  - Requires `Authorization` header to be set
+#### Mock Response
+Body (application/json)
+```
+  {
+    message: 'Successfully Deleted.'
+  }
+```
+
 DOCUMENTS
 ---------
-## Create Document
+## Create a Document
 #### Request
-  - Endpoint **POST** `/documents`
+  - Endpoint: **POST** `/documents`
   - Requires `Authorization` header to be set
 ```
 {
   "title": "Marvel",
   "content": "Diary of a movie addict",
-  "owner": "mcdonalds"
-  "type": "private"
+  "ownerId": 1
 }
 ```
 #### Mock Response
   - Body `(application/json)`
 ```
 {
-  status: 200,
-  message: 'Document created'
+  message: 'Document created',
+  doc: {
+     "title": "Marvel",
+     "content": "Diary of a movie addict",
+     "ownerId": "1"
+ }
 }
 ```
-## Get Document
+
+## Get Documents
 #### Request
-  - Endpoint **GET** `/documents`
-  - Optional queries **page** (for the page number) && **limit** (number of documents per page)
+  - Endpoint: **GET** `/documents`
+  - Optional queries **offset** (equivalent to page numbers) && **limit** (number of documents per page)
   - Requires `Authorization` header to be set
 
 #### Mock Response
@@ -286,27 +319,25 @@ DOCUMENTS
   {
     "title": "Marvel",
     "content": "Diary of a movie addict",
-    "role": "admin",
-    "owner": "mcdonalds",
-    "type: "private",
+    "roleId": "1",
+    "ownerId": "1",
     "createdAt": "2016-13-06T09:25:29.316Z",
     "updatedAt": "2016-13-06T09:25:29.316Z"
   },
   {
     "title": "The accountant",
     "content": "J.K simmons was in the movie as well as Ben Affleck, one of my fav",
-    "role": "regular",
-    "owner": "mcdonalds",
-    "type: "public",
+    "role": "1",
+    "owner": "2",
     "createdAt": "2016-13-06T09:25:29.316Z",
     "updatedAt": "2016-13-06T09:25:29.316Z"
   }
 ]
 ```
 
-## Get A Document
+## Get a Document
 #### Request
-  - Endpoint **GET** `/documents/:id` where id is the id of the document
+  - Endpoint: **GET** `/documents/:id` where id is the id of the document
   - Requires `Authorization` header to be set
 
 ##### Mock Response
@@ -314,9 +345,8 @@ DOCUMENTS
 {
   "title": "Marvel",
   "content": "Diary of a movie addict",
-  "role": "admin",
-  "owner": "mcdonalds",
-  "type: "private",
+  "roleId": "1",
+  "ownerId": "2",
   "createdAt": "2016-13-06T09:25:29.316Z",
   "updatedAt": "2016-13-06T09:25:29.316Z"
 }
@@ -324,45 +354,51 @@ DOCUMENTS
 
 ## Get Documents By User
 #### Request
-  - Endpoint **GET** `/users/:id/documents` id is the id of the user
+  - Endpoint: **GET** `/users/:id/documents` id is the id of the user
   - Requires `Authorization` header to be set
 #### Mock Response
 ```
 [
   {
-    "title": "The accountant",
-    "content": "J.K simmons was in the movie as well as Ben Affleck, one of my fav",
-    "role": "admin",
-    "owner": "mcdonalds",
-    "type: "public",
+    "title": "History Books",
+    "content": "Ryan holiday writes a lot of History books"
+    "roleId": "1",
+    "ownerId": "1",
     "createdAt": "2016-13-06T09:25:29.316Z",
     "updatedAt": "2016-13-06T09:25:29.316Z"
   }
 ]
 ```
 
-## Update Document
+## Update a Document
 #### Request
-  - Endpoint **PUT** `/documents/:id` id is the id of the document
+  - Endpoint: **PUT** `/documents/:id` id is the id of the document
   - Requires `Authorization` header to be set
 ```
 {
-  "title": "The accountant",
-  "content": "J.K simmons was in the movie as well as Ben Affleck, one of my fav",
-  "role": "admin",
-  "owner": "mcdonalds",
-  "type: "private"
+  "title": "History Books",
+  "content": "Ryan holiday writes a lot of History books"
 }
 ```
 
-## Delete Document
+#### Mock Response
+```
+[
+   message: 'Your doc has been updated',
+   updatedDoc: {
+     "title": "French Books",
+     "content": "Marylong writes great french books",
+  }
+]
+```
+
+## Delete a  Document
 #### Request
-  - Endpoint **DELETE** `/documents/:id`id of the document
+  - Endpoint: **DELETE** `/documents/:id` id is the id of the document
   - Requires `Authorization` header to be set
 #### Mock Response
 ```
 {
-  status: 200,
-  message: 'Successfully deleted'
+  message: 'The Document was deleted'
 }
 ```

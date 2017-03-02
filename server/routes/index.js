@@ -1,5 +1,3 @@
-'use strict';
-
 const userController = require('../controllers').User;
 const docController = require('../controllers').Document;
 const roleController = require('../controllers').Role;
@@ -18,7 +16,7 @@ module.exports = (app) => {
 
   app.post('/users/login', userController.login);
 
-  app.post('/users/logout',  auth.isAuthenticated, userController.logout);
+  app.post('/users/logout', auth.isAuthenticated, userController.logout);
 
   app.post('/documents', auth.isAuthenticated, docController.create);
 
@@ -28,17 +26,17 @@ module.exports = (app) => {
 
   app.get('/documents/:id', auth.isAuthenticated, docController.getADoc);
 
-  app.put('/documents/:id', auth.isAuthenticated,  docController.updateADoc);
+  app.put('/documents/:id', auth.isAuthenticated, docController.updateADoc);
 
-  app.delete('/documents/:id',  auth.isAuthenticated, docController.deleteADoc);
+  app.delete('/documents/:id', auth.isAuthenticated, docController.deleteADoc);
 
-  app.get('/users/:id/documents',  auth.isAuthenticated, docController.showMyDocs)
+  app.get('/users/:id/documents', auth.isAuthenticated, docController.showMyDocs);
 
-  app.post('/roles',auth.isAuthenticated, auth.isAdmin,  roleController.create);
+  app.post('/roles', auth.isAuthenticated, auth.isAdmin, roleController.create);
 
-  app.get('/roles',auth.isAuthenticated, auth.isAdmin,  roleController.all);
+  app.get('/roles', auth.isAuthenticated, auth.isAdmin, roleController.all);
 
-  app.put('/roles/:id', auth.isAuthenticated, auth.isAdmin,  roleController.update);
+  app.put('/roles/:id', auth.isAuthenticated, auth.isAdmin, roleController.update);
 
-  app.delete('/roles/:id', auth.isAuthenticated, auth.isAdmin,  roleController.delete);
+  app.delete('/roles/:id', auth.isAuthenticated, auth.isAdmin, roleController.delete);
 };

@@ -108,7 +108,7 @@ module.exports = {
    */
   showUsers(req, res) {
     User.findAll()
-      .then(users => res.status(200).send({
+      .then(users => res.send({
         users,
       }));
   },
@@ -146,7 +146,7 @@ module.exports = {
     })
       .then((deleteUser) => {
         if (deleteUser === 0) {
-          return res.status(200).send({
+          return res.status(404).send({
             message: 'This record was not deleted!',
           });
         }
@@ -171,7 +171,7 @@ module.exports = {
     })
     .then((existingUser) => {
       if (existingUser === null) {
-        return res.status(200).send({
+        return res.status(404).send({
           message: 'This record does not exists!',
         });
       }

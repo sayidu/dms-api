@@ -1,5 +1,3 @@
-'use strict';
-
 import bCrypt from 'bcrypt-nodejs';
 
 module.exports = (sequelize, DataTypes) => {
@@ -7,47 +5,47 @@ module.exports = (sequelize, DataTypes) => {
     username: {
       type: DataTypes.STRING,
       unique: true,
-      allowNull: false
+      allowNull: false,
     },
     firstName: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     lastName: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     email: {
       type: DataTypes.STRING,
       unique: true,
-      allowNull: false
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     roleId: {
       allowNull: false,
-      type: DataTypes.INTEGER
-    }
+      type: DataTypes.INTEGER,
+    },
   }, {
     classMethods: {
       associate(models) {
         User.belongsTo(models.Role, {
           as: 'role',
           foreignKey: {
-            allowNull: false
+            allowNull: false,
           },
-          onDelete: 'CASCADE'
+          onDelete: 'CASCADE',
         });
         User.hasMany(models.Document, {
           foreignKey: {
             name: 'ownerId',
-            allowNull: false
+            allowNull: false,
           },
-          onDelete: 'CASCADE'
+          onDelete: 'CASCADE',
         });
-      }
+      },
     },
     hooks: {
       beforeCreate: (validUser) => {
@@ -57,13 +55,13 @@ module.exports = (sequelize, DataTypes) => {
       beforeUpdate: (validUser) => {
         validUser.password = bCrypt.hashSync(validUser.password,
           bCrypt.genSaltSync(8));
-      }
+      },
     },
     instanceMethods: {
       validatePwd(password) {
         return bCrypt.compareSync(password, this.password);
-      }
-    }
+      },
+    },
   });
   return User;
 };

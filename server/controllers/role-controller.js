@@ -1,8 +1,4 @@
-'use strict';
-
-import {
-  Role
-} from '../models';
+import { Role } from '../models';
 
 module.exports = {
   /**
@@ -10,27 +6,25 @@ module.exports = {
    * Route: POST: /roles
    * @param {Object} req request object
    * @param {Object} res response object
-   * @returns {Object}
+   * @returns {void}
    */
   create(req, res) {
     Role.create(req.body)
-      .then((role) => {
-        return res.status(201).send({
-          message: "New Role Created"
-        })
-      })
-      .catch((err) => {
-        return res.status(400).send({
-          message: "Roles require unique titles."
-        })
-      })
+      .then(role => res.status(201).send({
+        message: 'New Role Created',
+        role,
+      }))
+      .catch(err => res.status(400).send({
+        message: 'Roles require unique titles.',
+        err: err.errors,
+      }));
   },
   /**
    * updates a role
    * Route: PUT: /roles/:id
    * @param {Object} req request object
    * @param {Object} res response object
-   * @returns {void}
+   * @returns {void|Object}
    */
   update(req, res) {
     Role.findById(req.params.id)
@@ -38,18 +32,18 @@ module.exports = {
         if (!foundRole) {
           return res.status(404)
             .send({
-              message: `Role with id: ${req.params.id} not found`
+              message: `Role with id: ${req.params.id} not found`,
             });
         }
         if (foundRole.dataValues.roleTitle !== 'admin') {
           foundRole.update(req.body)
-            .then((updatedRole) => {
-              return res.status(201).send(updatedRole);
-            });
+            .then(updatedRole => res.status(201).send(
+              { message: 'Sucessfully Updated', updatedRole },
+            ));
         } else {
           return res.status(401)
             .send({
-              message: 'Admin roleTitle can not be updated'
+              message: 'Admin roleTitle can not be updated',
             });
         }
       });
@@ -67,20 +61,18 @@ module.exports = {
         if (!foundRole) {
           return res.status(404)
             .send({
-              message: `Role with id: ${req.params.id} not found`
+              message: `Role with id: ${req.params.id} not found`,
             });
         }
         if (foundRole.dataValues.roleTitle !== 'admin') {
           foundRole.destroy()
-            .then((updatedRole) => {
-              return res.status(201).send({
-                message: 'The role has been successfully deleted'
-              });
-            });
+            .then(res.status(200).send({
+              message: 'Successfully Deleted',
+            }));
         } else {
           return res.status(401)
             .send({
-              message: 'Admin can not be deleted'
+              message: 'Admin can not be deleted',
             });
         }
       });
@@ -95,11 +87,9 @@ module.exports = {
    */
   all(req, res) {
     Role.findAll()
-      .then((roles) => {
-        return res.status(200).send({
-          message: "Roles Found",
-          roles: roles
-        })
-      });
-  }
-}
+      .then(roles => res.status(200).send({
+        message: 'Roles Found',
+        roles,
+      }));
+  },
+};

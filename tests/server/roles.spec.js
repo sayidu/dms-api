@@ -130,7 +130,8 @@ describe('Role API', (done) => {
       })
       .expect(201)
       .end(function (err, res) {
-        expect(res.body.roleTitle).to.equal('reviewer');
+        expect(res.body.message).to.equal('Sucessfully Updated');
+        expect(res.body.updatedRole.roleTitle).to.equal('reviewer');
         if (err) return done(err);
         done();
       });
@@ -167,9 +168,9 @@ describe('Role API', (done) => {
     request(app)
       .delete(`/roles/${roleId2}`)
       .set('Authorization', authToken)
-      .expect(201)
+      .expect(200)
       .end(function (err, res) {
-        expect(res.body.message).to.equal('The role has been successfully deleted');
+        expect(res.body.message).to.equal('Successfully Deleted');
         if (err) return done(err);
         done();
       });

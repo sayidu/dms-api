@@ -1,14 +1,12 @@
-'use strict';
-
 module.exports = (sequelize, DataTypes) => {
   const Document = sequelize.define('Document', {
     title: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     content: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     access: {
       type: DataTypes.STRING,
@@ -16,14 +14,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         isIn: [
-          ['public', 'private', 'role']
+          ['public', 'private', 'role'],
         ],
-      }
+      },
     },
     ownerId: {
       allowNull: false,
-      type: DataTypes.INTEGER
-    }
+      type: DataTypes.INTEGER,
+    },
   }, {
     classMethods: {
       associate(models) {
@@ -32,10 +30,10 @@ module.exports = (sequelize, DataTypes) => {
           foreignKey: {
             allowNull: false,
           },
-          onDelete: 'CASCADE'
+          onDelete: 'CASCADE',
         });
-      }
-    }
+      },
+    },
   });
   return Document;
 };

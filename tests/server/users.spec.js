@@ -151,7 +151,7 @@ describe('User API', () => {
         email: 'peterJones@gmail.com',
         password: 'peterJones'
       })
-      .expect(200)
+      .expect(404)
       .end(function (err, res) {
         expect(res.body.message).to.equal('This record does not exists!');
         if (err) return done(err);
@@ -181,7 +181,7 @@ describe('User API', () => {
         email: 'peterJones@gmail.com',
         password: 'peterJones'
       })
-      .expect(200)
+      .expect(404)
       .end(function (err, res) {
         expect(res.body.message).to.equal('This record does not exists!');
         if (err) return done(err);
@@ -195,7 +195,7 @@ describe('User API', () => {
       .set('Authorization', adminToken)
       .expect(200)
       .end(function (err, res) {
-        expect(res.body.message).to.equal('You have been logged out successfully!');
+        expect(res.body.message).to.equal('Logged out successfully!');
         if (err) return done(err);
         done();
       });
@@ -217,7 +217,7 @@ describe('User API', () => {
     request(app)
       .delete('/users/50')
       .set('Authorization', adminToken)
-      .expect(200)
+      .expect(404)
       .end(function (err, res) {
         expect(res.body.message).to.equal('This record was not deleted!');
         if (err) return done(err);

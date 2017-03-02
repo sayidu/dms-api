@@ -1,28 +1,24 @@
-'use strict';
-
 import jwt from 'jsonwebtoken';
-import {
-  Document,
-  User,
-  Role
-} from '../models';
+
+import { User, Role } from '../models';
+
 const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 
 module.exports = {
   isAuthenticated(req, res, next) {
-    const authToken = req.headers['authorization'];
+    const authToken = req.headers.authorization;
     if (!authToken) {
       return res.status(401).json({
         done: false,
-        message: 'Please Login!'
+        message: 'Please Login!',
       });
     } else if (authToken) {
-      jwt.verify(authToken, secret, function (err, decoded) {
+      jwt.verify(authToken, secret, (err, decoded) => {
         if (err) {
           return res.status(401)
             .json({
               done: false,
-              message: 'Invalid Authentication Details'
+              message: 'Invalid Authentication Details',
             });
         }
         req.decoded = decoded;
@@ -39,10 +35,10 @@ module.exports = {
               next();
             } else {
               return res.status(403).send({
-                message: 'Unauthorised User'
+                message: 'Unauthorised User',
               });
             }
           });
       });
-  }
+  },
 };

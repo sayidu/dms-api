@@ -1,5 +1,3 @@
-'use strict';
-
 const http = require('http');
 const app = require('../../app'); // The express app we just created
 
@@ -8,5 +6,3 @@ app.set('port', port);
 
 const server = http.createServer(app);
 server.listen(port);
-
-console.log('Server Started');

@@ -1,8 +1,4 @@
-import {
-  Document,
-  User,
-  Role
-} from '../models';
+import { Document, User, Role } from '../models';
 
 /**
  * Generates approriate query based on user role
@@ -14,14 +10,10 @@ const isAdmin = (userRole, userId) => {
   let query = {};
   if (userRole.dataValues.roleTitle === 'admin') {
     return query;
-  } else {
-    return query = {
-      where: {
-        ownerId: userId
-      }
-    };
   }
-}
+  query = { where: { ownerId: userId } };
+  return query;
+};
 
 module.exports = {
   /**
@@ -30,24 +22,20 @@ module.exports = {
    * Route: POST: /documents
    * @param {Object} req request object
    * @param {Object} res response object
-   * @returns {Object}
+   * @returns {void|Object}
    */
   create(req, res) {
     const data = req.body;
-    if (data.title && data.content && data.ownerId) {
-      Document.create(req.body)
-        .then((doc) => {
-          return res.status(201).send({
-            message: 'Document Created',
-            doc: doc
-          });
-        });
-    } else {
-      return res.status(400).json({
-        status: 400,
-        message: 'Please complete all required fields',
-      });
+    if (data.title && data.content) {
+      return Document.create(req.body)
+        .then(doc => res.status(201).send({
+          message: 'Document Created',
+          doc,
+        }));
     }
+    return res.status(400).json({
+      message: 'Please complete all required fields',
+    });
   },
   /**
    * getAllDocs
@@ -60,12 +48,12 @@ module.exports = {
    */
   getAllDocs(req, res) {
     Role.find({
-      where: req.decoded.RoleId
+      where: req.decoded.RoleId,
     }).then((userRole) => {
       const userId = req.decoded.UserId;
       const query = isAdmin(userRole, userId);
       query.order = [
-        ['createdAt', 'DESC']
+        ['createdAt', 'DESC'],
       ];
 
       if (req.query.limit >= 0) query.limit = req.query.limit;
@@ -74,7 +62,7 @@ module.exports = {
       Document.findAll(query)
         .then((docs) => {
           res.status(201).send({
-            docs
+            docs,
           });
         });
     });
@@ -89,42 +77,42 @@ module.exports = {
    */
   getADoc(req, res) {
     Document.findOne({
-        where: {
-          id: req.params.id
-        }
-      })
+      where: {
+        id: req.params.id,
+      },
+    })
       .then((doc) => {
         const docData = doc.dataValues;
 
-        if (docData.access === 'public' || (docData.access === 'private' && docData.ownerId === req.decoded.UserId)) {
+        if (docData.access === 'public'
+         || (docData.access === 'private' && docData.ownerId === req.decoded.UserId)) {
           return res.status(201).send({
-            message: doc
+            message: doc,
           });
         }
 
         if (docData.access === 'private' && docData.ownerId !== req.decoded.UserId) {
           return res.status(401).send({
-            message: 'Unauthorised to view this document'
+            message: 'Unauthorised to view this document',
           });
         }
         if (docData.access === 'role') {
           User.find({
-              where: {
-                id: docData.ownerId
-              }
-            })
+            where: {
+              id: docData.ownerId,
+            },
+          })
             .then((foundUser) => {
               if (foundUser.roleId === req.decoded.RoleId) {
                 return res.status(201).send({
                   message: 'A document was found',
-                  doc: doc
-                })
-              } else {
-                return res.status(403)
-                  .send({
-                    message: 'Unauthorised to view this document'
-                  });
+                  doc,
+                });
               }
+              return res.status(403)
+                  .send({
+                    message: 'Unauthorised to view this document',
+                  });
             });
         }
       });
@@ -140,23 +128,22 @@ module.exports = {
   updateADoc(req, res) {
     const updateFields = {};
     Document.findOne({
-        where: {
-          id: req.params.id
-        }
-      })
-      .then((selectDoc) => {
-        if (req.query.title) query.title = req.query.title;
-        if (req.query.content) query.content = req.query.content;
+      where: {
+        id: req.params.id,
+      },
+    })
+      .then(() => {
+        if (req.query.title) updateFields.title = req.query.title;
+        if (req.query.content) updateFields.content = req.query.content;
         Document.update(updateFields, {
-            where: {
-              id: req.params.id
-            }
-          })
-          .then((updateDoc) => {
-            return res.status(201).send({
-              message: 'Your doc has been updated'
-            });
-          });
+          where: {
+            id: req.params.id,
+          },
+        })
+          .then(updatedDoc => res.status(201).send({
+            message: 'Your doc has been updated',
+            updatedDoc,
+          }));
       });
   },
   /**
@@ -169,13 +156,13 @@ module.exports = {
    */
   deleteADoc(req, res) {
     Document.destroy({
-        where: {
-          id: req.params.id
-        }
-      })
+      where: {
+        id: req.params.id,
+      },
+    })
       .then((deleteDoc) => {
         if (deleteDoc === 0) {
-          return res.status(409).send({
+          return res.status(404).send({
             message: 'This record was not deleted!',
           });
         }
@@ -194,18 +181,18 @@ module.exports = {
    */
   showMyDocs(req, res) {
     Document.findAll({
-        where: {
-          ownerId: req.params.id
-        }
-      })
+      where: {
+        ownerId: req.params.id,
+      },
+    })
       .then((myDocs) => {
         if (myDocs.length === 0) {
-          return res.status(409).send({
+          return res.status(404).send({
             message: 'You are yet to create a document',
           });
         }
-        return res.status(200).send({
-          message: myDocs,
+        return res.send({
+          myDocs,
         });
       });
   },
@@ -218,20 +205,19 @@ module.exports = {
    * @returns {Object}
    */
   searchDocs(req, res) {
-    const searchOptions = {};
     const query = {
       where: {
         $and: [{
           $or: [{
-            access: 'public'
+            access: 'public',
           }, {
-            ownerId: req.decoded.UserId
-          }]
-        }]
+            ownerId: req.decoded.UserId,
+          }],
+        }],
       },
       order: [
-        ['createdAt', 'DESC']
-      ]
+        ['createdAt', 'DESC'],
+      ],
     };
 
     if (req.query.limit >= 0) query.limit = req.query.limit;
@@ -240,21 +226,19 @@ module.exports = {
       query.where.$and.push({
         $or: [{
           title: {
-            $iLike: `%${req.query.searchText}%`
-          }
+            $iLike: `%${req.query.searchText}%`,
+          },
         }, {
           content: {
-            $iLike: `%${req.query.searchText}%`
-          }
-        }]
+            $iLike: `%${req.query.searchText}%`,
+          },
+        }],
       });
     }
 
     Document.findAll(query)
-      .then((docs) => {
-        return res.status(201).send({
-          docs
-        });
-      });
-  }
+      .then(docs => res.status(201).send({
+        docs,
+      }));
+  },
 };

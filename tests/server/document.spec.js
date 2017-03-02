@@ -7,10 +7,8 @@ const models = require('../../server/models');
 const fakeData = require('../fakeData');
 let authToken, invalidToken, thirdToken, roleId1, roleId2;
 
-//Creation of docs should use a token also./
 describe('Document API', function () {
   before((done) => {
-    //Admin Created, Role ID, Creates Document 1
     models.Role.create(fakeData.adminRole)
       .then((roleData) => {
         roleId1 = roleData.dataValues.id;
@@ -24,8 +22,8 @@ describe('Document API', function () {
             authToken = res.body.token;
             if (err) return done(err);
           });
-      })
-      //regularRole created, creates document 2
+      });
+
     models.Role.create(fakeData.regularRole)
       .then((roleData) => {
         roleId2 = roleData.dataValues.id;
@@ -241,7 +239,7 @@ describe('Document API', function () {
       .set('Authorization', authToken)
       .expect(201)
       .end(function (err, res) {
-        console.log(res.body.docs.length);
+        expect((res.body.docs).length).to.be.greaterThan(11);
         if (err) return done(err);
         done();
       });
@@ -263,7 +261,7 @@ describe('Document API', function () {
     request(app)
       .delete('/documents/60')
       .set('Authorization', authToken)
-      .expect(409)
+      .expect(404)
       .end(function (err, res) {
         expect(res.body.message).to.equal('This record was not deleted!');
         if (err) return done(err);

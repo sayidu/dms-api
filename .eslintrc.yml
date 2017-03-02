@@ -21,4 +21,6 @@ rules:
     - always
   max-len:
     - 1
-    - 80
+    - 100
+  consistent-return:
+    - 0
