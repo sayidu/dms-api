@@ -68,7 +68,7 @@ describe('User API', () => {
     request(app)
       .get('/users/1')
       .set('Content-Type', 'application/json')
-      .expect(201)
+      .expect(200)
       .end(function (err, res) {
         expect(res.body.validUser).to.have.property('roleId');
         if (err) return done(err);
@@ -106,9 +106,9 @@ describe('User API', () => {
         firstName: 'chicken',
         lastName: 'michelin'
       })
-      .expect(201)
+      .expect(200)
       .end(function (err, res) {
-        expect(res.body.message).to.equal('Your details have beeen updated');
+        expect(res.body.message).to.equal('Successfully Updated');
         if (err) return done(err);
         done();
       });
@@ -178,7 +178,8 @@ describe('User API', () => {
     request(app)
       .post('/users/login')
       .send({
-        email: 'peterJones@gmail.com'
+        email: 'peterJones@gmail.com',
+        password: 'peterJones'
       })
       .expect(200)
       .end(function (err, res) {
@@ -204,9 +205,9 @@ describe('User API', () => {
     request(app)
       .delete('/users/1')
       .set('Authorization', adminToken)
-      .expect(201)
+      .expect(200)
       .end(function (err, res) {
-        expect(res.body.message).to.equal('User deleted');
+        expect(res.body.message).to.equal('Successfully Deleted');
         if (err) return done(err);
         done();
       });

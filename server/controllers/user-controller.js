@@ -1,29 +1,28 @@
-'use strict';
-
 import jwt from 'jsonwebtoken';
-import {
-  User,
-} from '../models';
+
+import { User } from '../models';
+
 const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 
 module.exports = {
   /**
-   * Creates a user
+   * create
+   * @desc Creates a user
    * Route: POST: /users
    * @param {Object} req request object
    * @param {Object} res response object
-   * @returns {void}
+   * @returns {void|Object}
    */
   create(req, res) {
     User.findOne({
-        where: {
-          email: req.body.email
-        }
-      })
+      where: {
+        email: req.body.email,
+      },
+    })
       .then((existingUser) => {
         if (existingUser != null) {
           return res.status(409).send({
-            message: "A user with this email already exists!",
+            message: 'A user with this email already exists!',
           });
         }
 
@@ -33,7 +32,7 @@ module.exports = {
               UserId: user.id,
               RoleId: user.roleId,
             }, secret, {
-              expiresIn: 86400
+              expiresIn: 86400,
             });
 
             const userInfo = {
@@ -42,39 +41,38 @@ module.exports = {
               firstName: user.firstName,
               lastName: user.lastName,
               email: user.email,
-              password: user.password,
               createdAt: user.createdAt,
               updatedAt: user.updatedAt,
-              roleId: user.roleId
+              roleId: user.roleId,
             };
 
-            res.status(201).send({
+            return res.status(201).send({
               token,
+              message: 'Your registration was succesful',
               expiresIn: 86400,
-              userInfo
+              userInfo,
             });
           })
-          .catch((err) => {
-            res.status(400).send(err.errors);
-          });
+          .catch(err => res.status(400).send(err.errors));
       });
   },
   /**
-   * updates a user's details
-   * Route: UPDATE: /users/:id
+   * update
+   * @desc updates a user's details
+   * Route: PUT: /users/:id
    * @param {Object} req request object
    * @param {Object} res response object
    * @returns {void|Object}
    */
   update(req, res) {
-    let updateFields = {};
+    const updateFields = {};
 
     User.findOne({
       where: {
-        id: req.params.id
-      }
-    }).
-    then((foundUser) => {
+        id: req.params.id,
+      },
+    })
+    .then((foundUser) => {
       if (foundUser === null) {
         return res.status(404).send({
           message: 'This record does not exists!',
@@ -90,87 +88,114 @@ module.exports = {
       }
 
       User.update(updateFields, {
-          where: {
-            id: req.params.id
-          }
-        })
-        .then((updateUser) => {
-          res.status(201).send({
-            message: 'Your details have beeen updated'
-          });
-        });
+        where: {
+          id: req.params.id,
+        },
+      })
+        .then(updateUser => res.send({
+          message: 'Successfully Updated',
+          updatedUser: updateUser,
+        }));
     });
   },
   /**
-   * gets all user's details
-   * Route: UPDATE: /users/:id
+   * showUsers
+   * @desc gets details for all users
+   * Route: GET: /users
    * @param {Object} req request object
    * @param {Object} res response object
    * @returns {void}
    */
   showUsers(req, res) {
     User.findAll()
-      .then((users) => {
-        res.status(200).send({
-          users
-        });
-      });
+      .then(users => res.status(200).send({
+        users,
+      }));
   },
+   /**
+   * findaUser
+   * @desc gets details for a specific user
+   * Route: GET: /users/:id
+   * @param {Object} req request object
+   * @param {Object} res response object
+   * @returns {Object}
+   */
   findaUser(req, res) {
     User.findOne({
-        where: {
-          id: req.params.id
-        }
-      })
-      .then((validUser) => {
-        res.status(201).send({
-          validUser
-        })
-      });
+      where: {
+        id: req.params.id,
+      },
+    })
+      .then(validUser => res.send({
+        validUser,
+      }));
   },
+  /**
+   * delete
+   * @desc delete a specific user
+   * Route: DELETE: /users/:id
+   * @param {Object} req request object
+   * @param {Object} res response object
+   * @returns {Object}
+   */
   delete(req, res) {
     User.destroy({
-        where: {
-          id: req.params.id
-        }
-      })
+      where: {
+        id: req.params.id,
+      },
+    })
       .then((deleteUser) => {
         if (deleteUser === 0) {
           return res.status(200).send({
-            message: "This record was not deleted!",
+            message: 'This record was not deleted!',
           });
         }
-        res.status(201).send({
-          message: "User deleted",
-        })
+        return res.send({
+          message: 'Successfully Deleted',
+        });
       });
   },
+  /**
+   * login
+   * @desc  login as a user
+   * Route: POST: /users/login
+   * @param {Object} req request object
+   * @param {Object} res response object
+   * @returns {Object}
+   */
   login(req, res) {
     User.findOne({
       where: {
-        email: req.body.email
-      }
-    }).
-    then((existingUser) => {
+        email: req.body.email,
+      },
+    })
+    .then((existingUser) => {
       if (existingUser === null) {
         return res.status(200).send({
-          message: "This record does not exists!",
+          message: 'This record does not exists!',
         });
       }
       if (existingUser.validatePwd(req.body.password) && existingUser) {
-        res.status(200).send({
-          message: 'Welcome to the Document Management System'
-        })
-      } else {
-        res.status(401).send({
-          message: 'Invalid Password!'
-        })
+        return res.status(200).send({
+          message: 'Welcome to the Document Management System',
+        });
       }
+      return res.status(401).send({
+        message: 'Invalid Password!',
+      });
     });
   },
+  /**
+   * logout
+   * @desc  logout as a user
+   * Route: POST: /users/logout
+   * @param {Object} req request object
+   * @param {Object} res response object
+   * @returns {Object}
+   */
   logout(req, res) {
-    res.status(200).send({
-      message: 'You have been logged out successfully!'
-    })
-  }
-}
+    return res.status(200).send({
+      message: 'Logged out successfully!',
+    });
+  },
+};

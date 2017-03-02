@@ -22,8 +22,7 @@ describe('Document API', function () {
           .end(function (err, res) {
             fakeData.document1.ownerId = res.body.userInfo.id;
             authToken = res.body.token;
-            console.log("authToken", authToken);
-            //if (err) return done(err);
+            if (err) return done(err);
           });
       })
       //regularRole created, creates document 2
@@ -40,7 +39,7 @@ describe('Document API', function () {
             fakeData.document3.ownerId = res.body.userInfo.id;
             invalidToken = res.body.token;
             models.Document.bulkCreate(fakeData.bulkDocuments);
-           //  if (err) return done(err);
+            if (err) return done(err);
           });
       });
 
@@ -53,7 +52,7 @@ describe('Document API', function () {
           .end(function (err, res) {
             thirdToken = res.body.token;
             done();
-           // if (err) return done(err);
+            if (err) return done(err);
           });
       });
   });
