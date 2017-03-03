@@ -2,7 +2,7 @@ const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 
-const port = process.env.PORT || 8000;
+
 const app = express();
 
 // Log requests to the console.
@@ -16,8 +16,5 @@ app.get('/', (req, res) => res.status(200).send({
   message: 'Welcome to our Document Management System.',
 }));
 
-app.listen(port, () => {
-  console.log('Server Up and Running!');
-});
 
 module.exports = app;

@@ -53,8 +53,10 @@ module.exports = (sequelize, DataTypes) => {
           bCrypt.genSaltSync(8));
       },
       beforeUpdate: (validUser) => {
-        validUser.password = bCrypt.hashSync(validUser.password,
+        if (validUser._changed.password) {
+          validUser.password = bCrypt.hashSync(validUser.password,
           bCrypt.genSaltSync(8));
+        }
       },
     },
     instanceMethods: {

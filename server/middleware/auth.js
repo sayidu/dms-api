@@ -6,7 +6,7 @@ const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 
 module.exports = {
   isAuthenticated(req, res, next) {
-    const authToken = req.headers.authorization;
+    const authToken = req.headers.authorization || req.headers['x-access-token'];
     if (!authToken) {
       return res.status(401).json({
         done: false,
@@ -34,7 +34,7 @@ module.exports = {
             if (role.dataValues.roleTitle === 'admin') {
               next();
             } else {
-              return res.status(403).send({
+              return res.status(401).send({
                 message: 'Unauthorised User',
               });
             }

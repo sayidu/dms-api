@@ -6,14 +6,14 @@ const app = require('../../app');
 const _ = require('lodash');
 const models = require('../../server/models');
 const fakeData = require('../fakeData');
-let authToken, regularToken, roleId1, roleId2;
+let authToken, regularToken, adminRoleId, regRoleId;
 
 describe('Role API', (done) => {
   before((done) => {
     models.Role.create(fakeData.adminRole)
       .then((roleData) => {
-        roleId1 = roleData.dataValues.id;
-        fakeData.firstUser.roleId = roleId1;
+        adminRoleId = roleData.dataValues.id;
+        fakeData.firstUser.roleId = adminRoleId;
         request(app)
           .post('/users')
           .set('Content-Type', 'application/json')
@@ -21,14 +21,13 @@ describe('Role API', (done) => {
           .end(function (err, res) {
             fakeData.document1.ownerId = res.body.userInfo.id;
             authToken = res.body.token;
-            if (err) return done(err);
           });
       })
 
     models.Role.create(fakeData.regularRole)
       .then((roleData) => {
-        roleId2 = roleData.dataValues.id;
-        fakeData.secondUser.roleId = roleId2;
+        regRoleId = roleData.dataValues.id;
+        fakeData.secondUser.roleId = regRoleId;
         request(app)
           .post('/users')
           .set('Content-Type', 'application/json')
@@ -36,7 +35,6 @@ describe('Role API', (done) => {
           .end(function (err, res) {
             fakeData.document2.ownerId = res.body.userInfo.id;
             regularToken = res.body.token;
-            if (err) return done(err);
             done();
           });
       });
@@ -57,7 +55,7 @@ describe('Role API', (done) => {
       });
   });
 
-  it('Admin can create a new role that does not title', (done) => {
+  it('Admin cannot create a new role without a role title', (done) => {
     request(app)
       .post('/roles')
       .set('Authorization', authToken)
@@ -70,12 +68,12 @@ describe('Role API', (done) => {
       });
   });
 
-  it('Non-admin can not create a new role that has a unique title', (done) => {
+  it('Non-admin can not create a new role', (done) => {
     request(app)
       .post('/roles')
       .set('Authorization', regularToken)
       .send(fakeData.testRole1)
-      .expect(403)
+      .expect(401)
       .end(function (err, res) {
         expect(res.body.message).to.equals('Unauthorised User');
         if (err) return done(err);
@@ -100,7 +98,7 @@ describe('Role API', (done) => {
     request(app)
       .get('/roles')
       .set('Authorization', regularToken)
-      .expect(403)
+      .expect(401)
       .end(function (err, res) {
         expect(res.body.message).to.equals('Unauthorised User');
         if (err) return done(err);
@@ -123,7 +121,7 @@ describe('Role API', (done) => {
   });
   it('ensures that a non admin role can be updated', (done) => {
     request(app)
-      .put(`/roles/${roleId2}`)
+      .put(`/roles/${regRoleId}`)
       .set('Authorization', authToken)
       .send({
         roleTitle: 'reviewer'
@@ -138,7 +136,7 @@ describe('Role API', (done) => {
   });
   it('ensures that a admin role can not be updated', (done) => {
     request(app)
-      .put(`/roles/${roleId1}`)
+      .put(`/roles/${adminRoleId}`)
       .set('Authorization', authToken)
       .send({
         roleTitle: 'reviewer'
@@ -166,7 +164,7 @@ describe('Role API', (done) => {
   });
   it('ensures that a non admin role can be deleted', (done) => {
     request(app)
-      .delete(`/roles/${roleId2}`)
+      .delete(`/roles/${regRoleId}`)
       .set('Authorization', authToken)
       .expect(200)
       .end(function (err, res) {
@@ -188,7 +186,7 @@ describe('Role API', (done) => {
   });
   it('ensures that a admin role can not be deleted', (done) => {
     request(app)
-      .delete(`/roles/${roleId1}`)
+      .delete(`/roles/${adminRoleId}`)
       .set('Authorization', authToken)
       .send({
         roleTitle: 'reviewer'

@@ -1,6 +1,6 @@
-const User = require('./user-controller');
-const Document = require('./document-controller');
-const Role = require('./role-controller');
+import User from './user-controller';
+import Document from './document-controller';
+import Role from './role-controller';
 
 module.exports = {
   User,

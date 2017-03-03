@@ -22,7 +22,7 @@ module.exports = {
     firstName: 'Jane',
     lastName: 'Doe',
     email: 'jane_doe@gmail.com',
-    password: 'shalomRocks',
+    password: 'sequel',
     roleId: 1
   },
   secondUser: {

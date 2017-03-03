@@ -5,19 +5,18 @@ const expect = require('chai').expect;
 const app = require('../../app');
 const models = require('../../server/models');
 const fakeData = require('../fakeData');
-let roleId1, roleId2, adminToken;
+let adminRoleId, regRoleId, adminToken;
 
 describe('User API', () => {
 
-  before((done) => {
-    models.Role.create(fakeData.adminRole)
+  before(() => {
+    return models.Role.create(fakeData.adminRole)
       .then((roleData) => {
-        roleId1 = roleData.dataValues.id;
-      });
-    models.Role.create(fakeData.regularRole)
+        adminRoleId = roleData.dataValues.id;
+        return models.Role.create(fakeData.regularRole)
+      })
       .then((roleData) => {
-        roleId2 = roleData.dataValues.id;
-        done();
+        regRoleId = roleData.dataValues.id;
       });
   });
 
@@ -99,42 +98,12 @@ describe('User API', () => {
       });
   });
 
-  it('validates that a user can update the first and last name fields', (done) => {
-    request(app)
-      .put('/users/1')
-      .send({
-        firstName: 'chicken',
-        lastName: 'michelin'
-      })
-      .expect(200)
-      .end(function (err, res) {
-        expect(res.body.message).to.equal('Successfully Updated');
-        if (err) return done(err);
-        done();
-      });
-  });
-
-  it('validates that a user can not update a user record that does not exist', (done) => {
-    request(app)
-      .put('/users/50')
-      .send({
-        firstName: 'chicken',
-        lastName: 'michelin'
-      })
-      .expect(404)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('This record does not exists!');
-        if (err) return done(err);
-        done();
-      });
-  });
-
   it('validates login for the user created', (done) => {
     request(app)
       .post('/users/login')
       .send({
         email: 'jane_doe@gmail.com',
-        password: 'shalomRocks'
+        password: 'sequel'
       })
       .expect(200)
       .end(function (err, res) {
@@ -164,7 +133,7 @@ describe('User API', () => {
       .post('/users/login')
       .send({
         email: 'jane_doe@gmail.com',
-        password: 'shalomRs'
+        password: 'seqlize'
       })
       .expect(401)
       .end(function (err, res) {
@@ -196,6 +165,36 @@ describe('User API', () => {
       .expect(200)
       .end(function (err, res) {
         expect(res.body.message).to.equal('Logged out successfully!');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('validates that a user can update the first and last name fields', (done) => {
+    request(app)
+      .put('/users/1')
+      .send({
+        firstName: 'chicken',
+        lastName: 'michelin'
+      })
+      .expect(200)
+      .end(function (err, res) {
+        expect(res.body.message).to.equal('Successfully Updated');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('validates that a user can not update a user record that does not exist', (done) => {
+    request(app)
+      .put('/users/50')
+      .send({
+        firstName: 'chicken',
+        lastName: 'michelin'
+      })
+      .expect(404)
+      .end(function (err, res) {
+        expect(res.body.message).to.equals('This record does not exists!');
         if (err) return done(err);
         done();
       });

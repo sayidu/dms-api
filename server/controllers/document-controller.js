@@ -1,7 +1,8 @@
 import { Document, User, Role } from '../models';
 
 /**
- * Generates approriate query based on user role
+ * isAdmin()
+ * @desc Generates approriate query based on user role
  * @param {Object} userRole sequleize Instance object
  * @param {Number} userId userId
  * @returns {Object} query for searching all docs.
@@ -25,17 +26,11 @@ module.exports = {
    * @returns {void|Object}
    */
   create(req, res) {
-    const data = req.body;
-    if (data.title && data.content) {
-      return Document.create(req.body)
+    Document.create(req.body)
         .then(doc => res.status(201).send({
           message: 'Document Created',
           doc,
         }));
-    }
-    return res.status(400).json({
-      message: 'Please complete all required fields',
-    });
   },
   /**
    * getAllDocs
@@ -133,8 +128,8 @@ module.exports = {
       },
     })
       .then(() => {
-        if (req.query.title) updateFields.title = req.query.title;
-        if (req.query.content) updateFields.content = req.query.content;
+        updateFields.title = req.body.title;
+        updateFields.content = req.body.content;
         Document.update(updateFields, {
           where: {
             id: req.params.id,
@@ -185,16 +180,9 @@ module.exports = {
         ownerId: req.params.id,
       },
     })
-      .then((myDocs) => {
-        if (myDocs.length === 0) {
-          return res.status(404).send({
-            message: 'You are yet to create a document',
-          });
-        }
-        return res.send({
-          myDocs,
-        });
-      });
+      .then(myDocs => res.send({
+        myDocs,
+      }));
   },
   /**
    * searchDocs

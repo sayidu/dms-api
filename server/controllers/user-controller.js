@@ -73,6 +73,7 @@ module.exports = {
       },
     })
     .then((foundUser) => {
+      let updateFields = {};
       if (foundUser === null) {
         return res.status(404).send({
           message: 'This record does not exists!',
@@ -87,11 +88,7 @@ module.exports = {
         updateFields.lastName = req.body.lastName;
       }
 
-      User.update(updateFields, {
-        where: {
-          id: req.params.id,
-        },
-      })
+      foundUser.update(updateFields)
         .then(updateUser => res.send({
           message: 'Successfully Updated',
           updatedUser: updateUser,
@@ -107,7 +104,7 @@ module.exports = {
    * @returns {void}
    */
   showUsers(req, res) {
-    User.findAll()
+    User.findAll({ attributes: ['id', 'username', 'email', 'createdAt', 'updatedAt', 'roleId'] })
       .then(users => res.send({
         users,
       }));
@@ -121,11 +118,7 @@ module.exports = {
    * @returns {Object}
    */
   findaUser(req, res) {
-    User.findOne({
-      where: {
-        id: req.params.id,
-      },
-    })
+    User.findById(req.params.id)
       .then(validUser => res.send({
         validUser,
       }));
@@ -175,8 +168,15 @@ module.exports = {
           message: 'This record does not exists!',
         });
       }
-      if (existingUser.validatePwd(req.body.password) && existingUser) {
+      if (existingUser && existingUser.validatePwd(req.body.password)) {
+        const token = jwt.sign({
+          UserId: existingUser.id,
+          RoleId: existingUser.RoleId,
+        }, secret, { expiresIn: 86400 });
+
         return res.status(200).send({
+          token,
+          expiresIn: 86400,
           message: 'Welcome to the Document Management System',
         });
       }

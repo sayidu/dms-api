@@ -1,7 +1,8 @@
+import auth from '../middleware/auth';
+
 const userController = require('../controllers').User;
 const docController = require('../controllers').Document;
 const roleController = require('../controllers').Role;
-const auth = require('../middleware/auth');
 
 module.exports = (app) => {
   app.get('/users', auth.isAuthenticated, auth.isAdmin, userController.showUsers);

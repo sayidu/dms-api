@@ -5,14 +5,14 @@ const expect = require('chai').expect;
 const app = require('../../app');
 const models = require('../../server/models');
 const fakeData = require('../fakeData');
-let authToken, invalidToken, thirdToken, roleId1, roleId2;
+let authToken, regularToken, testerToken, adminRoleId, regRoleId;
 
-describe('Document API', function () {
+describe('Document API', () => {
   before((done) => {
     models.Role.create(fakeData.adminRole)
       .then((roleData) => {
-        roleId1 = roleData.dataValues.id;
-        fakeData.firstUser.roleId = roleId1;
+        adminRoleId = roleData.dataValues.id;
+        fakeData.firstUser.roleId = adminRoleId;
         request(app)
           .post('/users')
           .set('Content-Type', 'application/json')
@@ -20,14 +20,13 @@ describe('Document API', function () {
           .end(function (err, res) {
             fakeData.document1.ownerId = res.body.userInfo.id;
             authToken = res.body.token;
-            if (err) return done(err);
           });
       });
 
     models.Role.create(fakeData.regularRole)
       .then((roleData) => {
-        roleId2 = roleData.dataValues.id;
-        fakeData.secondUser.roleId = roleId2;
+        regRoleId = roleData.dataValues.id;
+        fakeData.secondUser.roleId = regRoleId;
         request(app)
           .post('/users')
           .set('Content-Type', 'application/json')
@@ -35,9 +34,8 @@ describe('Document API', function () {
           .end(function (err, res) {
             fakeData.document2.ownerId = res.body.userInfo.id;
             fakeData.document3.ownerId = res.body.userInfo.id;
-            invalidToken = res.body.token;
+            regularToken = res.body.token;
             models.Document.bulkCreate(fakeData.bulkDocuments);
-            if (err) return done(err);
           });
       });
 
@@ -48,14 +46,13 @@ describe('Document API', function () {
           .set('Content-Type', 'application/json')
           .send(fakeData.thirdUser)
           .end(function (err, res) {
-            thirdToken = res.body.token;
+            testerToken = res.body.token;
             done();
-            if (err) return done(err);
           });
       });
   });
 
- after(() => models.Document.sequelize.sync({ force: true }));
+after(() => models.Document.sequelize.sync({ force: true }));
 
   it('validates that a new User Document created has a published date defined', (done) => {
     request(app)
@@ -86,25 +83,13 @@ describe('Document API', function () {
       });
   });
 
-  it('only document with all the required fields: title, content, ownerId are created', (done) => {
-    request(app)
-      .post('/documents')
-      .set('Authorization', invalidToken)
-      .send(fakeData.invalidDoc)
-      .expect(400)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('Please complete all required fields');
-        if (err) return done(err);
-        done();
-      });
-  });
-
   it('validates that a user can update title and content details for their document', (done) => {
     request(app)
       .put('/documents/1')
       .set('Authorization', authToken)
       .send({
-        title: 'The Right Database'
+        title: 'The Right Database',
+        content: 'This content is required'
       })
       .expect(201)
       .end(function (err, res) {
@@ -117,12 +102,11 @@ describe('Document API', function () {
   it('validate creation of private documents', (done) => {
     request(app)
       .post('/documents')
-      .set('Authorization', invalidToken)
+      .set('Authorization', regularToken)
       .send(fakeData.document3)
       .expect(201)
       .end(function (err, res) {
         expect(res.body.doc.access).to.equals('private');
-        expect(res.body.doc).to.have.property('access');
         expect(res.body.message).to.equals('Document Created');
         if (err) return done(err);
         done();
@@ -132,7 +116,7 @@ describe('Document API', function () {
   it('validates ONLY the creator of a document can retrieve a file with “\access\” set as “\private\”', (done) => {
     request(app)
       .get('/documents/38')
-      .set('Authorization', thirdToken)
+      .set('Authorization', testerToken)
       .expect(401)
       .end(function (err, res) {
         expect(res.body.message).to.have.equals('Unauthorised to view this document');
@@ -144,7 +128,7 @@ describe('Document API', function () {
   it('validates the creator of a document can access it even when the doc is private', (done) => {
     request(app)
       .get('/documents/38')
-      .set('Authorization', invalidToken)
+      .set('Authorization', regularToken)
       .expect(201)
       .end(function (err, res) {
         expect(res.body.message.id).to.have.equals(38);
@@ -155,15 +139,14 @@ describe('Document API', function () {
   });
 
   it('creates a document with access set to role', (done) => {
-    fakeData.document4.ownerId = roleId2;
+    fakeData.document4.ownerId = regRoleId;
     request(app)
       .post('/documents')
-      .set('Authorization', invalidToken)
+      .set('Authorization', regularToken)
       .send(fakeData.document4)
       .expect(201)
       .end(function (err, res) {
         expect(res.body.doc.access).to.equals('role');
-        expect(res.body.doc).to.have.property('access');
         expect(res.body.message).to.equals('Document Created');
         if (err) return done(err);
         done();
@@ -173,7 +156,7 @@ describe('Document API', function () {
   it('users with the same role can access the document', (done) => {
     request(app)
       .get('/documents/40')
-      .set('Authorization', invalidToken)
+      .set('Authorization', regularToken)
       .expect(201)
       .end(function (err, res) {
         expect(res.body.message).to.equals('A document was found');
@@ -186,7 +169,7 @@ describe('Document API', function () {
   it('only users with the same role can access the document', (done) => {
     request(app)
       .get('/documents/40')
-      .set('Authorization', thirdToken)
+      .set('Authorization', testerToken)
       .expect(403)
       .end(function (err, res) {
         expect(res.body.message).to.equals('Unauthorised to view this document');
@@ -222,7 +205,7 @@ describe('Document API', function () {
 
   it('validates that offset and limit applied when fetching all the pages', (done) => {
     request(app)
-      .get('/documents?limit=10&offset=1')
+      .get('/documents?limit=10&offset=2')
       .set('Authorization', authToken)
       .expect(201)
       .end(function (err, res) {
