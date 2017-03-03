@@ -1,6 +1,6 @@
-**TravisCI**
+[![Build Status](https://travis-ci.org/andela-sayidu/dms-api.svg?branch=master)](https://travis-ci.org/andela-sayidu/dms-api)
 [![Coverage Status](https://coveralls.io/repos/github/andela-sayidu/dms-api/badge.svg?branch=dev)](https://coveralls.io/github/andela-sayidu/dms-api?branch=dev)
-**Codeclimate**
+
 # Document Management System
 Document Management System API contains API endpoints which allows users to create, edit, retrieve and delete documents.
 
@@ -396,6 +396,7 @@ DOCUMENTS
 #### Request
   - Endpoint: **DELETE** `/documents/:id` id is the id of the document
   - Requires `Authorization` header to be set
+
 #### Mock Response
 ```
 {
