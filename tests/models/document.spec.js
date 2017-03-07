@@ -24,13 +24,14 @@ after(() => models.Document.sequelize.sync({ force: true }));
   it('validates Document creation with valid details', (done) => {
     models.Document.create(fakeData.document3)
       .then((doc) => {
-        expect('History').to.equals(doc.dataValues.title);
-        expect('The history is made!!.').to.equals(doc.dataValues.content);
-        expect('private').to.equals(doc.dataValues.access);
+        expect('History').to.equal(doc.dataValues.title);
+        expect('The history is made!!.').to.equal(doc.dataValues.content);
+        expect('private').to.equal(doc.dataValues.access);
         expect(doc.dataValues.createdAt).to.exist;
         done();
       });
   });
+
   it('Documents are not with specified title', (done) => {
     models.Document.create(fakeData.invalidDoc)
       .then((doc) => {
@@ -38,22 +39,24 @@ after(() => models.Document.sequelize.sync({ force: true }));
         done();
       })
       .catch((err) => {
-        expect(err.name).to.equals('SequelizeValidationError');
-        expect(err.errors[0].message).to.equals('title cannot be null');
+        expect(err.name).to.equal('SequelizeValidationError');
+        expect(err.errors[0].message).to.equal('title cannot be null');
         done();
       });
   });
+
   it('Documents with invalid access can not be created', (done) => {
     models.Document.create(fakeData.invalidDoc2)
       .then((doc) => {
         done();
       })
       .catch((err) => {
-        expect(err.name).to.equals('SequelizeValidationError');
-        expect(err.errors[0].message).to.equals('Validation isIn failed');
+        expect(err.name).to.equal('SequelizeValidationError');
+        expect(err.errors[0].message).to.equal('Validation isIn failed');
         done();
       });
   });
+
   it('verifies that documents can only be created by existing users', (done) => {
     fakeData.document4.ownerId = 5;
     models.Document.create(fakeData.document4)
@@ -61,7 +64,7 @@ after(() => models.Document.sequelize.sync({ force: true }));
         done();
       })
       .catch((err) => {
-        expect(err.name).to.equals('SequelizeForeignKeyConstraintError');
+        expect(err.name).to.equal('SequelizeForeignKeyConstraintError');
         done();
       });
   });

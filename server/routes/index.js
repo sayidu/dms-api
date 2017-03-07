@@ -7,13 +7,13 @@ const roleController = require('../controllers').Role;
 module.exports = (app) => {
   app.get('/users', auth.isAuthenticated, auth.isAdmin, userController.showUsers);
 
-  app.get('/users/:id', userController.findaUser);
+  app.get('/users/:id', auth.isAuthenticated, userController.findaUser);
 
   app.post('/users', userController.create);
 
-  app.delete('/users/:id', userController.delete);
+  app.delete('/users/:id', auth.isAuthenticated, userController.delete);
 
-  app.put('/users/:id', userController.update);
+  app.put('/users/:id', auth.isAuthenticated, userController.update);
 
   app.post('/users/login', userController.login);
 

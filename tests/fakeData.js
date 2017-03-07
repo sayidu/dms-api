@@ -23,7 +23,8 @@ module.exports = {
     lastName: 'Doe',
     email: 'jane_doe@gmail.com',
     password: 'sequel',
-    roleId: 1
+    roleId: 1,
+    userState: true
   },
   secondUser: {
     username: faker.internet.userName(),
@@ -33,7 +34,8 @@ module.exports = {
     password: faker.internet.password(),
     createdAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
-    roleId: 2
+    roleId: 2,
+    userState: true
   },
   thirdUser: {
     username: faker.internet.userName(),
@@ -43,14 +45,16 @@ module.exports = {
     password: faker.internet.password(),
     createdAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
-    roleId: 3
+    roleId: 3,
+    userState: true
   },
   invalidUser: {
     username: faker.internet.userName(),
     lastName: faker.name.lastName(),
     email: faker.internet.email(),
     password: faker.internet.password(),
-    roleId: 2
+    roleId: 2,
+    userState: true
   },
   invalidUser2: {
     username: faker.internet.userName(),
@@ -60,7 +64,8 @@ module.exports = {
     password: faker.internet.password(),
     createdAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
-    roleId: 2
+    roleId: 2,
+    userState: true
   },
   document1: {
     title: faker.name.jobTitle(),

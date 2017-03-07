@@ -35,8 +35,8 @@ describe("Model for User Table", () => {
         done();
       })
       .catch((err) => {
-        expect(err.errors[0].message).to.equals('username must be unique');
-        expect(err.message).to.equals('Validation error');
+        expect(err.errors[0].message).to.equal('username must be unique');
+        expect(err.message).to.equal('Validation error');
         done();
       });
   });
@@ -48,8 +48,8 @@ describe("Model for User Table", () => {
         done();
       })
       .catch((err) => {
-        expect(err.name).to.equals('SequelizeUniqueConstraintError');
-        expect(err.errors[0].message).to.equals('email must be unique');
+        expect(err.name).to.equal('SequelizeUniqueConstraintError');
+        expect(err.errors[0].message).to.equal('email must be unique');
         done();
       });
   });
@@ -61,7 +61,7 @@ describe("Model for User Table", () => {
         done();
       })
       .catch((err) => {
-        expect(err.name).to.equals('SequelizeForeignKeyConstraintError');
+        expect(err.name).to.equal('SequelizeForeignKeyConstraintError');
         done();
       });
   });
@@ -78,8 +78,8 @@ describe("Model for User Table", () => {
       .then((updateUser) => {
         models.User.findById(1)
           .then((checkUser) => {
-            expect(checkUser.dataValues.firstName).to.equals('Patrick');
-            expect(checkUser.dataValues.lastName).to.equals('Bull');
+            expect(checkUser.dataValues.firstName).to.equal('Patrick');
+            expect(checkUser.dataValues.lastName).to.equal('Bull');
             done();
           });
       })

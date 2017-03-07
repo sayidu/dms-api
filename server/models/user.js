@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.INTEGER,
     },
+    userState: {
+      allowNull: false,
+      type: DataTypes.BOOLEAN
+    }
   }, {
     classMethods: {
       associate(models) {
