@@ -26,6 +26,17 @@ module.exports = {
     roleId: 1,
     userState: true
   },
+  userTwo: {
+    username: faker.internet.userName(),
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    email: faker.internet.email(),
+    password: faker.internet.password(),
+    createdAt: faker.date.recent(),
+    updatedAt: faker.date.recent(),
+    roleId: 2,
+    userState: true
+  },
   secondUser: {
     username: faker.internet.userName(),
     firstName: faker.name.firstName(),
@@ -45,14 +56,16 @@ module.exports = {
     password: faker.internet.password(),
     createdAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
-    roleId: 3
+    roleId: 3,
+    userState: true
   },
   invalidUser: {
     username: faker.internet.userName(),
     lastName: faker.name.lastName(),
     email: faker.internet.email(),
     password: faker.internet.password(),
-    roleId: 2
+    roleId: 2,
+    userState: true
   },
   invalidUser2: {
     username: faker.internet.userName(),
@@ -62,22 +75,27 @@ module.exports = {
     password: faker.internet.password(),
     createdAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
-    roleId: 2
+    roleId: 2,
+    userState: true
   },
   document1: {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    access: 'public'
+    access: 'public',
+    ownerId: 1
   },
   document2: {
     title: faker.name.jobTitle(),
-    content: faker.name.jobTitle()
+    content: faker.name.jobTitle(),
+    ownerId: 2
   },
   document3: {
     id: 38,
     title: 'History',
     content: 'The history is made!!.',
     access: 'private',
+    createdAt: faker.date.recent(),
+    updatedAt: faker.date.recent(),
     ownerId: 2
   },
   document4: {

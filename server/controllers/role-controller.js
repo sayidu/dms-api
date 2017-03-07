@@ -1,4 +1,6 @@
-import { Role } from '../models';
+import {
+  Role
+} from '../models';
 
 module.exports = {
   /**
@@ -39,9 +41,10 @@ module.exports = {
         }
         if (foundRole.dataValues.roleTitle !== 'admin') {
           foundRole.update(req.body)
-            .then(updatedRole => res.status(201).send(
-              { message: 'Sucessfully Updated', updatedRole },
-            ));
+            .then(updatedRole => res.status(201).send({
+              message: 'Sucessfully Updated',
+              updatedRole
+            }, ));
         } else {
           return res.status(403)
             .send({

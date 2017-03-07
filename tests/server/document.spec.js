@@ -5,54 +5,54 @@ const expect = require('chai').expect;
 const app = require('../../app');
 const models = require('../../server/models');
 const fakeData = require('../fakeData');
-let authToken, regularToken, testerToken, adminRoleId, regRoleId;
+
+const promisify = (data) => {
+  return new Promise((resolve, reject) => {
+    request(app)
+      .post('/users')
+      .set('Content-Type', 'application/json')
+      .send(data)
+      .end((err, res) => {
+        resolve(res.body.token);
+      });
+  });
+}
 
 describe('Document API', () => {
-  before((done) => {
-    models.Role.create(fakeData.adminRole)
+  let authToken, regularToken, testerToken, adminRoleId, regRoleId;
+
+  before(() => {
+    return models.Role.create(fakeData.adminRole)
       .then((roleData) => {
         adminRoleId = roleData.dataValues.id;
         fakeData.firstUser.roleId = adminRoleId;
-        request(app)
-          .post('/users')
-          .set('Content-Type', 'application/json')
-          .send(fakeData.firstUser)
-          .end((err, res) => {
-            fakeData.document1.ownerId = res.body.userInfo.id;
-            authToken = res.body.token;
-          });
-      });
-
-    models.Role.create(fakeData.regularRole)
+        return models.Role.create(fakeData.regularRole)
+      })
       .then((roleData) => {
         regRoleId = roleData.dataValues.id;
-        fakeData.secondUser.roleId = regRoleId;
-        request(app)
-          .post('/users')
-          .set('Content-Type', 'application/json')
-          .send(fakeData.secondUser)
-          .end((err, res) => {
-            fakeData.document2.ownerId = res.body.userInfo.id;
-            fakeData.document3.ownerId = res.body.userInfo.id;
-            regularToken = res.body.token;
-            models.Document.bulkCreate(fakeData.bulkDocuments);
-          });
-      });
-
-    models.Role.create(fakeData.testRole)
-      .then((roleData) => {
-        request(app)
-          .post('/users')
-          .set('Content-Type', 'application/json')
-          .send(fakeData.thirdUser)
-          .end((err, res) => {
-            testerToken = res.body.token;
-            done();
-          });
+        return models.Role.create(fakeData.testRole)
+      })
+      .then(() => {
+        return promisify(fakeData.firstUser)
+      })
+      .then((firstToken) => {
+        authToken = firstToken;
+        return promisify(fakeData.userTwo)
+      }).then((secondToken) => {
+        regularToken = secondToken;
+        return promisify(fakeData.thirdUser)
+      })
+      .then((thirdToken) => {
+        testerToken = thirdToken;
+      })
+      .then(() => {
+        return models.Document.bulkCreate(fakeData.bulkDocuments);
       });
   });
 
-after(() => models.Document.sequelize.sync({ force: true }));
+  after(() => models.Document.sequelize.sync({
+    force: true
+  }));
 
   it('validates that a new User Document created has a published date defined', (done) => {
     request(app)
@@ -102,7 +102,7 @@ after(() => models.Document.sequelize.sync({ force: true }));
   it('validate creation of private documents', (done) => {
     request(app)
       .post('/documents')
-      .set('Authorization', regularToken)
+      .set('Authorization', authToken)
       .send(fakeData.document3)
       .expect(201)
       .end((err, res) => {
@@ -128,7 +128,7 @@ after(() => models.Document.sequelize.sync({ force: true }));
   it('validates the creator of a document can access it even when the doc is private', (done) => {
     request(app)
       .get('/documents/38')
-      .set('Authorization', regularToken)
+      .set('Authorization', authToken)
       .expect(201)
       .end((err, res) => {
         expect(res.body.message.id).to.have.equal(38);
@@ -252,7 +252,7 @@ after(() => models.Document.sequelize.sync({ force: true }));
       });
   });
 
-   it('ensures that a user can search authorised documents with keywords', (done) => {
+  it('ensures that a user can search authorised documents with keywords', (done) => {
     request(app)
       .get('/search?searchText=a')
       .set('Authorization', authToken)

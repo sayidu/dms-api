@@ -90,7 +90,6 @@ describe('User API', () => {
       .set('Authorization', adminToken)
       .expect(200)
       .end((err, res) => {
-        console.log("validUser Role Iss", res.body);
         expect(res.body.validUser).to.have.property('roleId');
         if (err) return done(err);
         done();
@@ -109,7 +108,6 @@ describe('User API', () => {
       });
   });
 
-  //test me
   it('validates that all users are not accessible to non-admins', (done) => {
     request(app)
       .get('/users')

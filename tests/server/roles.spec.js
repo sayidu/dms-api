@@ -195,18 +195,6 @@ describe('Role API', (done) => {
       });
   });
 
-  it('ensures a non-admin cannot delete a role', (done) => {
-    request(app)
-      .delete(`/roles/${regRoleId}`)
-      .set('Authorization', regularToken)
-      .expect(401)
-      .end((err, res) => {
-        expect(res.body.message).to.equal('Unauthorised User');
-        if (err) return done(err);
-        done();
-      });
-  });
-
   it('provides feedback for a role that can not be deleted', (done) => {
     request(app)
       .delete('/roles/10')
