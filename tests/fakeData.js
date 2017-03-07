@@ -23,7 +23,8 @@ module.exports = {
     lastName: 'Doe',
     email: 'jane_doe@gmail.com',
     password: 'sequel',
-    roleId: 1
+    roleId: 1,
+    userState: true
   },
   secondUser: {
     username: faker.internet.userName(),
@@ -33,7 +34,8 @@ module.exports = {
     password: faker.internet.password(),
     createdAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
-    roleId: 2
+    roleId: 2,
+    userState: true
   },
   thirdUser: {
     username: faker.internet.userName(),

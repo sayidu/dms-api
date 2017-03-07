@@ -12,7 +12,7 @@ describe("Model for Role Table", () => {
     models.Role.create(fakeData.adminRole)
       .then((role) => {
         expect(role.dataValues.id).to.exist;
-        expect('admin').to.equals(role.dataValues.roleTitle);
+        expect('admin').to.equal(role.dataValues.roleTitle);
         expect(role.dataValues.createdAt).to.exist;
         done();
       })
@@ -20,25 +20,27 @@ describe("Model for Role Table", () => {
         done();
       });
   });
+
   it('roleTitle must be unique', (done) => {
     models.Role.create(fakeData.adminRole)
       .then((role) => {
         done();
       })
       .catch((err) => {
-        expect(err.errors[0].message).to.equals('roleTitle must be unique');
-        expect(err.message).to.equals('Validation error');
+        expect(err.errors[0].message).to.equal('roleTitle must be unique');
+        expect(err.message).to.equal('Validation error');
         done();
       });
   });
+
   it('roleTitle must be defined', (done) => {
     models.Role.create(fakeData.invalidRole)
       .then((role) => {
         done();
       })
       .catch((err) => {
-        expect(err.name).to.equals('SequelizeValidationError');
-        expect(err.errors[0].message).to.equals('roleTitle cannot be null');
+        expect(err.name).to.equal('SequelizeValidationError');
+        expect(err.errors[0].message).to.equal('roleTitle cannot be null');
         done();
       });
   });

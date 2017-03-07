@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 
-import { User } from '../models';
+import {
+  User
+} from '../models';
 
 const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
 
@@ -15,10 +17,10 @@ module.exports = {
    */
   create(req, res) {
     User.findOne({
-      where: {
-        email: req.body.email,
-      },
-    })
+        where: {
+          email: req.body.email,
+        },
+      })
       .then((existingUser) => {
         if (existingUser != null) {
           return res.status(409).send({
@@ -44,6 +46,7 @@ module.exports = {
               createdAt: user.createdAt,
               updatedAt: user.updatedAt,
               roleId: user.roleId,
+              userState: true
             };
 
             return res.status(201).send({
@@ -68,32 +71,32 @@ module.exports = {
     const updateFields = {};
 
     User.findOne({
-      where: {
-        id: req.params.id,
-      },
-    })
-    .then((foundUser) => {
-      let updateFields = {};
-      if (foundUser === null) {
-        return res.status(404).send({
-          message: 'This record does not exists!',
-        });
-      }
+        where: {
+          id: req.params.id,
+        },
+      })
+      .then((foundUser) => {
+        let updateFields = {};
+        if (foundUser === null) {
+          return res.status(404).send({
+            message: 'This record does not exists!',
+          });
+        }
 
-      if (req.body.firstName) {
-        updateFields.firstName = req.body.firstName;
-      }
+        if (req.body.firstName) {
+          updateFields.firstName = req.body.firstName;
+        }
 
-      if (req.body.lastName) {
-        updateFields.lastName = req.body.lastName;
-      }
+        if (req.body.lastName) {
+          updateFields.lastName = req.body.lastName;
+        }
 
-      foundUser.update(updateFields)
-        .then(updateUser => res.send({
-          message: 'Successfully Updated',
-          updatedUser: updateUser,
-        }));
-    });
+        foundUser.update(updateFields)
+          .then(updateUser => res.send({
+            message: 'Successfully Updated',
+            updatedUser: updateUser,
+          }));
+      });
   },
   /**
    * showUsers
@@ -104,12 +107,14 @@ module.exports = {
    * @returns {void}
    */
   showUsers(req, res) {
-    User.findAll({ attributes: ['id', 'username', 'email', 'createdAt', 'updatedAt', 'roleId'] })
+    User.findAll({
+        attributes: ['id', 'username', 'email', 'createdAt', 'updatedAt', 'roleId']
+      })
       .then(users => res.send({
         users,
       }));
   },
-   /**
+  /**
    * findaUser
    * @desc gets details for a specific user
    * Route: GET: /users/:id
@@ -133,10 +138,10 @@ module.exports = {
    */
   delete(req, res) {
     User.destroy({
-      where: {
-        id: req.params.id,
-      },
-    })
+        where: {
+          id: req.params.id,
+        },
+      })
       .then((deleteUser) => {
         if (deleteUser === 0) {
           return res.status(404).send({
@@ -158,32 +163,38 @@ module.exports = {
    */
   login(req, res) {
     User.findOne({
-      where: {
-        email: req.body.email,
-      },
-    })
-    .then((existingUser) => {
-      if (existingUser === null) {
-        return res.status(404).send({
-          message: 'This record does not exists!',
-        });
-      }
-      if (existingUser && existingUser.validatePwd(req.body.password)) {
-        const token = jwt.sign({
-          UserId: existingUser.id,
-          RoleId: existingUser.RoleId,
-        }, secret, { expiresIn: 86400 });
+        where: {
+          email: req.body.email,
+        },
+      })
+      .then((existingUser) => {
+        if (existingUser === null) {
+          return res.status(404).send({
+            message: 'This record does not exists!',
+          });
+        }
+        if (existingUser && existingUser.validatePwd(req.body.password)) {
+          const token = jwt.sign({
+            UserId: existingUser.id,
+            RoleId: existingUser.RoleId,
+          }, secret, {
+            expiresIn: 86400
+          });
 
-        return res.status(200).send({
-          token,
-          expiresIn: 86400,
-          message: 'Welcome to the Document Management System',
+          existingUser.update({
+            userState: true
+          });
+
+          return res.status(200).send({
+            token,
+            expiresIn: 86400,
+            message: 'Welcome to the Document Management System',
+          });
+        }
+        return res.status(401).send({
+          message: 'Invalid Password!',
         });
-      }
-      return res.status(401).send({
-        message: 'Invalid Password!',
       });
-    });
   },
   /**
    * logout
@@ -194,8 +205,16 @@ module.exports = {
    * @returns {Object}
    */
   logout(req, res) {
-    return res.status(200).send({
-      message: 'Logged out successfully!',
-    });
+    User.findById(req.decoded.UserId)
+      .then((user) => {
+        user.update({
+            userState: false
+          })
+          .then((updatedUser) => {
+            return res.status(200).send({
+              message: 'Logged out successfully!',
+            });
+          })
+      });
   },
 };

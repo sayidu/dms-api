@@ -81,13 +81,13 @@ To create a new user, make a **POST** request to `/users`
   message: 'Your registration was succesful',
   expiresIn: 86400,
   userInfo : {
-  "id: 1,
-  "firstName": "Jane",
-  "lastName": "Doe",
-  "username": "janedoe",
-  "email": "janedoe@mail.com",
-  "roleId": "1"
-}
+    "id: 1,
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "username": "janedoe",
+    "email": "janedoe@mail.com",
+    "roleId": "1"
+  }
 }
 ```
 
@@ -303,7 +303,7 @@ DOCUMENTS
      "title": "Marvel",
      "content": "Diary of a movie addict",
      "ownerId": "1"
- }
+  }
 }
 ```
 

@@ -1,8 +1,12 @@
 import jwt from 'jsonwebtoken';
 
-import { User, Role } from '../models';
+import {
+  User,
+  Role
+} from '../models';
 
 const secret = process.env.JWT_SECRET_TOKEN || 'Keep my secret';
+
 
 module.exports = {
   isAuthenticated(req, res, next) {
@@ -21,8 +25,18 @@ module.exports = {
               message: 'Invalid Authentication Details',
             });
         }
-        req.decoded = decoded;
-        return next();
+        User.findById(decoded.UserId).then((user) => {
+          const blacklistToken = user.dataValues.userState;
+          req.decoded = decoded;
+          if (blacklistToken === true) {
+            return next();
+          } else {
+            return res.status(401).json({
+              done: false,
+              message: 'Please Login!',
+            });
+          }
+        });
       });
     }
   },
@@ -31,12 +45,12 @@ module.exports = {
       .then((user) => {
         Role.findById(user.roleId)
           .then((role) => {
-            if (role.dataValues.roleTitle === 'admin') {
-              next();
-            } else {
+            if (role.dataValues.roleTitle !== 'admin') {
               return res.status(401).send({
                 message: 'Unauthorised User',
               });
+            } else {
+              return next();
             }
           });
       });
