@@ -78,7 +78,7 @@ describe('Middleware Authentication Tests', () => {
       });
   });
 
-  it('a token is blacklisted and can not be used for access after logout', (done) => {
+  it('a token is blacklisted and cannot be used for access after logout', (done) => {
     request(app)
       .get('/users')
       .set('Authorization', authToken)

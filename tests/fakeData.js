@@ -82,12 +82,16 @@ module.exports = {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
     access: 'public',
-    ownerId: 1
+    ownerId: 1,
+    createdAt: faker.date.recent(),
+    updatedAt: faker.date.recent()
   },
   document2: {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
-    ownerId: 2
+    ownerId: 2,
+    createdAt: faker.date.recent(),
+    updatedAt: faker.date.recent()
   },
   document3: {
     id: 38,
@@ -96,24 +100,30 @@ module.exports = {
     access: 'private',
     createdAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
-    ownerId: 2
+    ownerId: 1
   },
   document4: {
     id: 40,
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
     access: 'role',
+    createdAt: faker.date.recent(),
+    updatedAt: faker.date.recent(),
     ownerId: 2
   },
   invalidDoc: {
     content: faker.name.jobTitle(),
     access: 'role',
+    createdAt: faker.date.recent(),
+    updatedAt: faker.date.recent(),
     ownerId: 2
   },
   invalidDoc2: {
     title: faker.name.jobTitle(),
     content: faker.name.jobTitle(),
     access: 'bulkDoc',
+    createdAt: faker.date.recent(),
+    updatedAt: faker.date.recent(),
     ownerId: 1
   },
   bulkDocuments: [{

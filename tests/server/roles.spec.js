@@ -70,7 +70,7 @@ describe('Role API', (done) => {
       });
   });
 
-  it('a non-admin can not create a new role', (done) => {
+  it('a non-admin cannot create a new role', (done) => {
     request(app)
       .post('/roles')
       .set('Authorization', regularToken)
@@ -96,7 +96,7 @@ describe('Role API', (done) => {
       });
   });
 
-  it('roles can not be viewed by regular users', (done) => {
+  it('roles cannot be viewed by regular users', (done) => {
     request(app)
       .get('/roles')
       .set('Authorization', regularToken)
@@ -138,7 +138,7 @@ describe('Role API', (done) => {
       });
   });
 
-  it('ensures that an admin role can not be updated', (done) => {
+  it('ensures that an admin role cannot be updated', (done) => {
     request(app)
       .put(`/roles/${adminRoleId}`)
       .set('Authorization', authToken)
@@ -147,13 +147,13 @@ describe('Role API', (done) => {
       })
       .expect(403)
       .end((err, res) => {
-        expect(res.body.message).to.equal('Admin roleTitle can not be updated');
+        expect(res.body.message).to.equal('Admin roleTitle cannot be updated');
         if (err) return done(err);
         done();
       });
   });
 
-  it('provide feedback for a role that can not be updated', (done) => {
+  it('provide feedback for a role that cannot be updated', (done) => {
     request(app)
       .put('/roles/10')
       .set('Authorization', authToken)
@@ -195,7 +195,7 @@ describe('Role API', (done) => {
       });
   });
 
-  it('provides feedback for a role that can not be deleted', (done) => {
+  it('provides feedback for a role that cannot be deleted', (done) => {
     request(app)
       .delete('/roles/10')
       .set('Authorization', authToken)
@@ -207,7 +207,7 @@ describe('Role API', (done) => {
       });
   });
 
-  it('ensures that a admin role can not be deleted', (done) => {
+  it('ensures that a admin role cannot be deleted', (done) => {
     request(app)
       .delete(`/roles/${adminRoleId}`)
       .set('Authorization', authToken)
@@ -216,7 +216,7 @@ describe('Role API', (done) => {
       })
       .expect(403)
       .end((err, res) => {
-        expect(res.body.message).to.equal('Admin can not be deleted');
+        expect(res.body.message).to.equal('Admin cannot be deleted');
         if (err) return done(err);
         done();
       });

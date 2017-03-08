@@ -3,26 +3,8 @@ import {
   User,
   Role
 } from '../models';
+const helper = require('../../server/controllers/helper');
 
-/**
- * isAdmin()
- * @desc Generates approriate query based on user role
- * @param {Object} userRole sequleize Instance object
- * @param {Number} userId userId
- * @returns {Object} query for searching all docs.
- */
-const isAdmin = (userRole, userId) => {
-  let query = {};
-  if (userRole.dataValues.roleTitle !== 'admin') {
-    query = {
-      where: {
-        ownerId: userId
-      }
-    };
-    return query;
-  }
-  return query;
-};
 
 module.exports = {
   /**
@@ -34,8 +16,8 @@ module.exports = {
    * @returns {void|Object}
    */
   create(req, res) {
-    Document.create(req.body)
-      .then(doc => res.status(201).send({
+      Document.create(req.body)
+       .then(doc => res.status(201).send({
         message: 'Document Created',
         doc,
       }));
@@ -54,9 +36,9 @@ module.exports = {
       where: req.decoded.RoleId,
     }).then((userRole) => {
       const userId = req.decoded.UserId;
-      const query = isAdmin(userRole, userId);
+      const query = helper.isAdmin(userRole, userId);
       query.order = [
-        ['createdAt', 'DESC'],
+         ['createdAt', 'DESC'],
       ];
 
       if (req.query.limit >= 0) query.limit = req.query.limit;
@@ -64,7 +46,8 @@ module.exports = {
 
       Document.findAll(query)
         .then((docs) => {
-          res.status(201).send({
+          console.log("Admin or not, Query sent", query);
+          res.status(200).send({
             docs,
           });
         });
@@ -89,13 +72,13 @@ module.exports = {
 
         if (docData.access === 'public' ||
           (docData.access === 'private' && docData.ownerId === req.decoded.UserId)) {
-          return res.status(201).send({
+          return res.status(200).send({
             message: doc,
           });
         }
 
         if (docData.access === 'private' && docData.ownerId !== req.decoded.UserId) {
-          return res.status(401).send({
+          return res.status(403).send({
             message: 'Unauthorised to view this document',
           });
         }
@@ -107,7 +90,7 @@ module.exports = {
             })
             .then((foundUser) => {
               if (foundUser.roleId === req.decoded.RoleId) {
-                return res.status(201).send({
+                return res.status(200).send({
                   message: 'A document was found',
                   doc,
                 });
@@ -226,21 +209,22 @@ module.exports = {
     if (req.query.limit >= 0) query.limit = req.query.limit;
     if (req.query.offset >= 0) query.offset = (req.query.offset - 1) * 10;
     if (req.query.searchText) {
+      const filteredText = helper.sanitizeSearchString(req.query.searchText);
       query.where.$and.push({
         $or: [{
           title: {
-            $iLike: `%${req.query.searchText}%`,
+            $iLike: `%${filteredText}%`,
           },
         }, {
           content: {
-            $iLike: `%${req.query.searchText}%`,
+            $iLike: `%${filteredText}%`,
           },
         }],
       });
     }
 
     Document.findAll(query)
-      .then(docs => res.status(201).send({
+      .then(docs => res.status(200).send({
         docs,
       }));
   },

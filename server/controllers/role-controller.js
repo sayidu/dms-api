@@ -48,7 +48,7 @@ module.exports = {
         } else {
           return res.status(403)
             .send({
-              message: 'Admin roleTitle can not be updated',
+              message: 'Admin roleTitle cannot be updated',
             });
         }
       });
@@ -78,7 +78,7 @@ module.exports = {
         } else {
           return res.status(403)
             .send({
-              message: 'Admin can not be deleted',
+              message: 'Admin cannot be deleted',
             });
         }
       });

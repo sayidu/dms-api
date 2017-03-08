@@ -20,7 +20,7 @@ describe('User API', () => {
       });
   });
 
- after(() => models.User.sequelize.sync({
+  after(() => models.User.sequelize.sync({
     force: true
   }));
 
@@ -136,7 +136,7 @@ describe('User API', () => {
       });
   });
 
-  it('a user that does not exist can not login', (done) => {
+  it('a user that does not exist cannot login', (done) => {
     request(app)
       .post('/users/login')
       .send({
@@ -166,7 +166,7 @@ describe('User API', () => {
       });
   });
 
-  it('a user that does not exist can not login', (done) => {
+  it('a user that does not exist cannot login', (done) => {
     request(app)
       .post('/users/login')
       .send({
@@ -197,7 +197,7 @@ describe('User API', () => {
       });
   });
 
-  it('validates that a user can not update a user record that does not exist', (done) => {
+  it('validates that a user cannot update a user record that does not exist', (done) => {
     request(app)
       .put('/users/50')
       .set('Authorization', adminToken)
@@ -249,4 +249,23 @@ describe('User API', () => {
       });
   });
 
+  it('Test that users are directed to the homepage on request', (done) => {
+    request(app)
+      .get('/')
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.message).to.equal('Welcome to our Document Management System.');
+        done();
+      });
+  });
+
+    it('Test that users are directed to the homepage on invalid route request', (done) => {
+    request(app)
+      .get('/abds')
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.message).to.equal('Welcome to our Document Management System.');
+        done();
+      });
+  });
 });

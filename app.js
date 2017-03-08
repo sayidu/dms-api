@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 require('./server/routes')(app);
 
 
-app.get('/', (req, res) => res.status(200).send({
+app.get('*', (req, res) => res.status(200).send({
   message: 'Welcome to our Document Management System.',
 }));
 
