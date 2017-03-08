@@ -5,11 +5,11 @@ const env = process.env.NODE_ENV || 'development';
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
-const config = require('../config/config.json')[env];
+const config = require('../config/config.js')[env];
 
 const basename = path.basename(module.filename);
 const db = {};
-const sequelize = new Sequelize(process.env[config.use_env_variable], config);
+const sequelize = new Sequelize(config.use_env_variable, config);
 
 fs
   .readdirSync(__dirname)

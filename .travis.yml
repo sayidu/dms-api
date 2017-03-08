@@ -5,7 +5,7 @@ services:
   - postgresql
 before_script:
   - npm install
-  - psql -c 'create database "dmsApi";' -U postgres
+  - psql -c 'create database "travis";' -U postgres
   - node_modules/.bin/sequelize db:migrate
 after_success:
 - npm run coveralls
