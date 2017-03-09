@@ -80,6 +80,7 @@ describe('Middleware Authentication Tests', () => {
         expect(stub.next).to.have.been.called;
         done();
       });
+     stub.next.restore();
   });
 
   it('check that middleware calls next() function is not called for un-verified users', (done) => {
@@ -97,6 +98,8 @@ describe('Middleware Authentication Tests', () => {
         expect(stub.next).to.not.have.been.called;
         done();
       });
+
+    stub.next.restore();
   });
 
   it('Logout should blacklist the active token', (done) => {
