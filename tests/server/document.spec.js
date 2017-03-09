@@ -198,8 +198,7 @@ describe('Document API', () => {
       .set('Authorization', authToken)
       .expect(200)
       .end((err, res) => {
-        // /expect(res.body.docs[0].id).to.be.above(res.body.docs[1].id);
-       // expect(res.body.docs[0].createdAt).to.be.above(res.body.docs[1].createdAt);
+        expect(res.body.docs[1].id).to.be.above(res.body.docs[0].id);
         if (err) return done(err);
         done();
       });
@@ -223,7 +222,7 @@ describe('Document API', () => {
       .set('Authorization', authToken)
       .expect(200)
       .end((err, res) => {
-        expect(res.body.docs[1].id).to.equal(13)
+        expect(res.body.docs[1].id).to.equal(13);
         expect((res.body.docs).length).to.equal(10);
         if (err) return done(err);
         done();

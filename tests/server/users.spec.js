@@ -112,7 +112,7 @@ describe('User API', () => {
     request(app)
       .get('/users')
       .set('Authorization', regToken)
-      .expect(401)
+      .expect(403)
       .end((err, res) => {
         expect(res.body.message).to.equal('Unauthorised User');
         if (err) return done(err);

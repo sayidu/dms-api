@@ -6,6 +6,7 @@ const app = require('../../app');
 const models = require('../../server/models');
 const fakeData = require('../fakeData');
 const new_user = fakeData.firstUser;
+const sinon = require('sinon');
 let authToken;
 
 describe('Middleware Authentication Tests', () => {
@@ -62,6 +63,38 @@ describe('Middleware Authentication Tests', () => {
       .end((err, res) => {
         expect(res.status).to.equal(401);
         expect(res.body.message).to.equal('Invalid Authentication Details');
+        done();
+      });
+  });
+
+  it('check that middleware calls next() function is called for verified users', (done) => {
+    const stub = {
+      next: () => {}
+    }
+    sinon.spy(stub, 'next');
+
+    request(app)
+      .get('/users')
+      .set('Authorization', authToken)
+      .end(() => {
+        expect(stub.next).to.have.been.called;
+        done();
+      });
+  });
+
+  it('check that middleware calls next() function is not called for un-verified users', (done) => {
+    const randomTokenString = 'adsddsdsdfdsf';
+
+    const stub = {
+      next: () => {}
+    }
+    sinon.spy(stub, 'next');
+
+    request(app)
+      .get('/users')
+      .set('Authorization', randomTokenString)
+      .end(() => {
+        expect(stub.next).to.not.have.been.called;
         done();
       });
   });
