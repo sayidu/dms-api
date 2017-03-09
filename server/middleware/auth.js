@@ -46,7 +46,7 @@ module.exports = {
         Role.findById(user.roleId)
           .then((role) => {
             if (role.dataValues.roleTitle !== 'admin') {
-              return res.status(401).send({
+              return res.status(403).send({
                 message: 'Unauthorised User',
               });
             } else {

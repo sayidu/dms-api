@@ -75,7 +75,7 @@ describe('Role API', (done) => {
       .post('/roles')
       .set('Authorization', regularToken)
       .send(fakeData.testRole1)
-      .expect(401)
+      .expect(403)
       .end((err, res) => {
         expect(res.body.message).to.equal('Unauthorised User');
         if (err) return done(err);
@@ -100,7 +100,7 @@ describe('Role API', (done) => {
     request(app)
       .get('/roles')
       .set('Authorization', regularToken)
-      .expect(401)
+      .expect(403)
       .end((err, res) => {
         expect(res.body.message).to.equal('Unauthorised User');
         if (err) return done(err);
@@ -175,7 +175,7 @@ describe('Role API', (done) => {
       .send({
         roleTitle: 'reviewer'
       })
-      .expect(401)
+      .expect(403)
       .end((err, res) => {
         expect(res.body.message).to.equal('Unauthorised User');
         if (err) return done(err);
