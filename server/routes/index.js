@@ -1,5 +1,5 @@
 import auth from '../middleware/auth';
-
+import docCheck from '../middleware/user';
 const userController = require('../controllers').User;
 const docController = require('../controllers').Document;
 const roleController = require('../controllers').Role;
@@ -7,19 +7,19 @@ const roleController = require('../controllers').Role;
 module.exports = (app) => {
   app.get('/users', auth.isAuthenticated, auth.isAdmin, userController.showUsers);
 
-  app.get('/users/:id', userController.findaUser);
+  app.get('/users/:id', auth.isAuthenticated, userController.findaUser);
 
   app.post('/users', userController.create);
 
-  app.delete('/users/:id', userController.delete);
+  app.delete('/users/:id', auth.isAuthenticated, userController.delete);
 
-  app.put('/users/:id', userController.update);
+  app.put('/users/:id', auth.isAuthenticated, userController.update);
 
   app.post('/users/login', userController.login);
 
   app.post('/users/logout', auth.isAuthenticated, userController.logout);
 
-  app.post('/documents', auth.isAuthenticated, docController.create);
+  app.post('/documents', auth.isAuthenticated, docCheck.docExists, docController.create);
 
   app.get('/documents', auth.isAuthenticated, docController.getAllDocs);
 

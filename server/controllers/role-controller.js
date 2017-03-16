@@ -1,8 +1,11 @@
-import { Role } from '../models';
+import {
+  Role
+} from '../models';
 
 module.exports = {
   /**
-   * Creates a role
+   * create
+   * @desc Creates a role
    * Route: POST: /roles
    * @param {Object} req request object
    * @param {Object} res response object
@@ -20,7 +23,8 @@ module.exports = {
       }));
   },
   /**
-   * updates a role
+   * update
+   * @desc updates a role
    * Route: PUT: /roles/:id
    * @param {Object} req request object
    * @param {Object} res response object
@@ -37,19 +41,21 @@ module.exports = {
         }
         if (foundRole.dataValues.roleTitle !== 'admin') {
           foundRole.update(req.body)
-            .then(updatedRole => res.status(201).send(
-              { message: 'Sucessfully Updated', updatedRole },
-            ));
+            .then(updatedRole => res.status(201).send({
+              message: 'Sucessfully Updated',
+              updatedRole
+            }, ));
         } else {
-          return res.status(401)
+          return res.status(403)
             .send({
-              message: 'Admin roleTitle can not be updated',
+              message: 'Admin roleTitle cannot be updated',
             });
         }
       });
   },
   /**
-   * Delete a role
+   * delete
+   * @desc Delete a role
    * Route: DELETE: /roles/:id
    * @param {Object} req request object
    * @param {Object} res response object
@@ -70,9 +76,9 @@ module.exports = {
               message: 'Successfully Deleted',
             }));
         } else {
-          return res.status(401)
+          return res.status(403)
             .send({
-              message: 'Admin can not be deleted',
+              message: 'Admin cannot be deleted',
             });
         }
       });

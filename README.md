@@ -16,7 +16,8 @@ Installation
 3.  Change your directory `cd dms-api`
 4.  Install all dependencies `npm install`
 5.  Run tests  `npm test`
-6.  Start the app `npm start` and use the [postman collection](https://www.getpostman.com/collections/16cbaed248038069a004) to consume the API
+6.  Run `npm run startData` to populate your database with initial roles and user data.
+7.  Start the app `npm start` and use the [postman collection](https://www.getpostman.com/collections/16cbaed248038069a004) to consume the API
 
 ## API ENDPOINTS
 Access for the endpoints are restricted based on the Authorization token assigned to the user.
@@ -71,7 +72,8 @@ To create a new user, make a **POST** request to `/users`
   "username": "janedoe",
   "email": "janedoe@mail.com",
   "password": "secretkey",
-  "roleId": "1"
+  "roleId": "1",
+  "userState": true
 }
 ```
 #### Mock Response
@@ -81,13 +83,13 @@ To create a new user, make a **POST** request to `/users`
   message: 'Your registration was succesful',
   expiresIn: 86400,
   userInfo : {
-  "id: 1,
-  "firstName": "Jane",
-  "lastName": "Doe",
-  "username": "janedoe",
-  "email": "janedoe@mail.com",
-  "roleId": "1"
-}
+    "id: 1,
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "username": "janedoe",
+    "email": "janedoe@mail.com",
+    "roleId": "1"
+  }
 }
 ```
 
@@ -303,7 +305,7 @@ DOCUMENTS
      "title": "Marvel",
      "content": "Diary of a movie addict",
      "ownerId": "1"
- }
+  }
 }
 ```
 

@@ -5,54 +5,55 @@ const expect = require('chai').expect;
 const app = require('../../app');
 const models = require('../../server/models');
 const fakeData = require('../fakeData');
-let authToken, regularToken, testerToken, adminRoleId, regRoleId;
+const helper = require('../../server/controllers/helper');
+
+const promisify = (data) => {
+  return new Promise((resolve, reject) => {
+    request(app)
+      .post('/users')
+      .set('Content-Type', 'application/json')
+      .send(data)
+      .end((err, res) => {
+        resolve(res.body.token);
+      });
+  });
+}
 
 describe('Document API', () => {
-  before((done) => {
-    models.Role.create(fakeData.adminRole)
+  let authToken, regularToken, testerToken, adminRoleId, regRoleId;
+
+  before(() => {
+    return models.Role.create(fakeData.adminRole)
       .then((roleData) => {
         adminRoleId = roleData.dataValues.id;
         fakeData.firstUser.roleId = adminRoleId;
-        request(app)
-          .post('/users')
-          .set('Content-Type', 'application/json')
-          .send(fakeData.firstUser)
-          .end(function (err, res) {
-            fakeData.document1.ownerId = res.body.userInfo.id;
-            authToken = res.body.token;
-          });
-      });
-
-    models.Role.create(fakeData.regularRole)
+        return models.Role.create(fakeData.regularRole)
+      })
       .then((roleData) => {
         regRoleId = roleData.dataValues.id;
-        fakeData.secondUser.roleId = regRoleId;
-        request(app)
-          .post('/users')
-          .set('Content-Type', 'application/json')
-          .send(fakeData.secondUser)
-          .end(function (err, res) {
-            fakeData.document2.ownerId = res.body.userInfo.id;
-            fakeData.document3.ownerId = res.body.userInfo.id;
-            regularToken = res.body.token;
-            models.Document.bulkCreate(fakeData.bulkDocuments);
-          });
-      });
-
-    models.Role.create(fakeData.testRole)
-      .then((roleData) => {
-        request(app)
-          .post('/users')
-          .set('Content-Type', 'application/json')
-          .send(fakeData.thirdUser)
-          .end(function (err, res) {
-            testerToken = res.body.token;
-            done();
-          });
+        return models.Role.create(fakeData.testRole)
+      })
+      .then(() => {
+        return promisify(fakeData.firstUser)
+      })
+      .then((firstToken) => {
+        authToken = firstToken;
+        return promisify(fakeData.userTwo)
+      }).then((secondToken) => {
+        regularToken = secondToken;
+        return promisify(fakeData.thirdUser)
+      })
+      .then((thirdToken) => {
+        testerToken = thirdToken;
+      })
+      .then(() => {
+        return models.Document.bulkCreate(fakeData.bulkDocuments);
       });
   });
 
-after(() => models.Document.sequelize.sync({ force: true }));
+  after(() => models.Document.sequelize.sync({
+    force: true
+  }));
 
   it('validates that a new User Document created has a published date defined', (done) => {
     request(app)
@@ -60,9 +61,22 @@ after(() => models.Document.sequelize.sync({ force: true }));
       .set('Authorization', authToken)
       .send(fakeData.document1)
       .expect(201)
-      .end(function (err, res) {
+      .end((err, res) => {
         expect(res.body.doc).to.have.property('createdAt');
-        expect(res.body.message).to.equals('Document Created');
+        expect(res.body.message).to.equal('Document Created');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+ it('validates that a new User Document cannot create the same document twice', (done) => {
+    request(app)
+      .post('/documents')
+      .set('Authorization', authToken)
+      .send(fakeData.document1)
+      .expect(403)
+      .end((err, res) => {
+        expect(res.body.message).to.equal('This document already exists, change the title or content');
         if (err) return done(err);
         done();
       });
@@ -74,10 +88,10 @@ after(() => models.Document.sequelize.sync({ force: true }));
       .set('Authorization', authToken)
       .send(fakeData.document2)
       .expect(201)
-      .end(function (err, res) {
-        expect(res.body.doc.access).to.equals('public');
+      .end((err, res) => {
+        expect(res.body.doc.access).to.equal('public');
         expect(res.body.doc).to.have.property('access');
-        expect(res.body.message).to.equals('Document Created');
+        expect(res.body.message).to.equal('Document Created');
         if (err) return done(err);
         done();
       });
@@ -92,8 +106,8 @@ after(() => models.Document.sequelize.sync({ force: true }));
         content: 'This content is required'
       })
       .expect(201)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('Your doc has been updated');
+      .end((err, res) => {
+        expect(res.body.message).to.equal('Your doc has been updated');
         if (err) return done(err);
         done();
       });
@@ -102,12 +116,12 @@ after(() => models.Document.sequelize.sync({ force: true }));
   it('validate creation of private documents', (done) => {
     request(app)
       .post('/documents')
-      .set('Authorization', regularToken)
+      .set('Authorization', authToken)
       .send(fakeData.document3)
       .expect(201)
-      .end(function (err, res) {
-        expect(res.body.doc.access).to.equals('private');
-        expect(res.body.message).to.equals('Document Created');
+      .end((err, res) => {
+        expect(res.body.doc.access).to.equal('private');
+        expect(res.body.message).to.equal('Document Created');
         if (err) return done(err);
         done();
       });
@@ -117,9 +131,9 @@ after(() => models.Document.sequelize.sync({ force: true }));
     request(app)
       .get('/documents/38')
       .set('Authorization', testerToken)
-      .expect(401)
-      .end(function (err, res) {
-        expect(res.body.message).to.have.equals('Unauthorised to view this document');
+      .expect(403)
+      .end((err, res) => {
+        expect(res.body.message).to.have.equal('Unauthorised to view this document');
         if (err) return done(err);
         done();
       });
@@ -128,10 +142,10 @@ after(() => models.Document.sequelize.sync({ force: true }));
   it('validates the creator of a document can access it even when the doc is private', (done) => {
     request(app)
       .get('/documents/38')
-      .set('Authorization', regularToken)
-      .expect(201)
-      .end(function (err, res) {
-        expect(res.body.message.id).to.have.equals(38);
+      .set('Authorization', authToken)
+      .expect(200)
+      .end((err, res) => {
+        expect(res.body.message.id).to.have.equal(38);
         expect(res.body.message).to.have.property('access');
         if (err) return done(err);
         done();
@@ -145,9 +159,9 @@ after(() => models.Document.sequelize.sync({ force: true }));
       .set('Authorization', regularToken)
       .send(fakeData.document4)
       .expect(201)
-      .end(function (err, res) {
-        expect(res.body.doc.access).to.equals('role');
-        expect(res.body.message).to.equals('Document Created');
+      .end((err, res) => {
+        expect(res.body.doc.access).to.equal('role');
+        expect(res.body.message).to.equal('Document Created');
         if (err) return done(err);
         done();
       });
@@ -157,10 +171,10 @@ after(() => models.Document.sequelize.sync({ force: true }));
     request(app)
       .get('/documents/40')
       .set('Authorization', regularToken)
-      .expect(201)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('A document was found');
-        expect(res.body.doc.access).to.equals('role');
+      .expect(200)
+      .end((err, res) => {
+        expect(res.body.message).to.equal('A document was found');
+        expect(res.body.doc.access).to.equal('role');
         if (err) return done(err);
         done();
       });
@@ -171,8 +185,8 @@ after(() => models.Document.sequelize.sync({ force: true }));
       .get('/documents/40')
       .set('Authorization', testerToken)
       .expect(403)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('Unauthorised to view this document');
+      .end((err, res) => {
+        expect(res.body.message).to.equal('Unauthorised to view this document');
         if (err) return done(err);
         done();
       });
@@ -182,10 +196,9 @@ after(() => models.Document.sequelize.sync({ force: true }));
     request(app)
       .get('/documents')
       .set('Authorization', authToken)
-      .expect(201)
-      .end(function (err, res) {
-        expect(res.body.docs[0].id).to.be.above(res.body.docs[1].id);
-        expect(res.body.docs[0].createdAt).to.be.above(res.body.docs[1].createdAt);
+      .expect(200)
+      .end((err, res) => {
+        expect(res.body.docs[1].id).to.be.above(res.body.docs[0].id);
         if (err) return done(err);
         done();
       });
@@ -193,11 +206,11 @@ after(() => models.Document.sequelize.sync({ force: true }));
 
   it('validates that offset is applied when fetching all the pages', (done) => {
     request(app)
-      .get('/documents?limit=5')
+      .get('/documents?limit=11')
       .set('Authorization', authToken)
-      .expect(201)
-      .end(function (err, res) {
-        expect((res.body.docs).length).to.equals(5);
+      .expect(200)
+      .end((err, res) => {
+        expect((res.body.docs).length).to.equal(11);
         if (err) return done(err);
         done();
       });
@@ -207,10 +220,10 @@ after(() => models.Document.sequelize.sync({ force: true }));
     request(app)
       .get('/documents?limit=10&offset=2')
       .set('Authorization', authToken)
-      .expect(201)
-      .end(function (err, res) {
-        expect(res.body.docs[1].id).to.exist;
-        expect((res.body.docs).length).to.equals(10);
+      .expect(200)
+      .end((err, res) => {
+        expect(res.body.docs[1].id).to.equal(13);
+        expect((res.body.docs).length).to.equal(10);
         if (err) return done(err);
         done();
       });
@@ -220,8 +233,8 @@ after(() => models.Document.sequelize.sync({ force: true }));
     request(app)
       .get('/documents')
       .set('Authorization', authToken)
-      .expect(201)
-      .end(function (err, res) {
+      .expect(200)
+      .end((err, res) => {
         expect((res.body.docs).length).to.be.greaterThan(11);
         if (err) return done(err);
         done();
@@ -233,34 +246,53 @@ after(() => models.Document.sequelize.sync({ force: true }));
       .delete('/documents/5')
       .set('Authorization', authToken)
       .expect(200)
-      .end(function (err, res) {
+      .end((err, res) => {
         expect(res.body.message).to.equal('The Document was deleted');
         if (err) return done(err);
         done();
       });
   });
 
-  it('ensures that an existing document can not be deleted', (done) => {
+  it('ensures that an existing document cannot be deleted', (done) => {
     request(app)
       .delete('/documents/60')
       .set('Authorization', authToken)
       .expect(404)
-      .end(function (err, res) {
+      .end((err, res) => {
         expect(res.body.message).to.equal('This record was not deleted!');
         if (err) return done(err);
         done();
       });
   });
 
-   it('ensures that a user can search authorised documents with keywords', (done) => {
+  it('ensures that a user can search authorised documents with keywords', (done) => {
     request(app)
       .get('/search?searchText=a')
       .set('Authorization', authToken)
-      .expect(201)
-      .end(function (err, res) {
+      .expect(200)
+      .end((err, res) => {
         expect((res.body.docs).length).to.be.greaterThan(0);
         if (err) return done(err);
         done();
       });
+  });
+
+  it('ensures that search keywords are sanitized before a search', (done) => {
+    request(app)
+      .get('/search?searchText=a$!8')
+      .set('Authorization', authToken)
+      .expect(200)
+      .end((err, res) => {
+        expect((res.body.docs).length).to.equal(0);
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('ensures that numbers and alphbets are accepted as part of the search keywords', (done) => {
+    const searchText = 'a1!%8';
+    const filteredText =  helper.sanitizeSearchString(searchText);
+    expect(filteredText).to.equal('a18');
+    done();
   });
 });

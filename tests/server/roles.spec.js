@@ -18,7 +18,7 @@ describe('Role API', (done) => {
           .post('/users')
           .set('Content-Type', 'application/json')
           .send(fakeData.firstUser)
-          .end(function (err, res) {
+          .end((err, res) => {
             fakeData.document1.ownerId = res.body.userInfo.id;
             authToken = res.body.token;
           });
@@ -32,7 +32,7 @@ describe('Role API', (done) => {
           .post('/users')
           .set('Content-Type', 'application/json')
           .send(fakeData.secondUser)
-          .end(function (err, res) {
+          .end((err, res) => {
             fakeData.document2.ownerId = res.body.userInfo.id;
             regularToken = res.body.token;
             done();
@@ -40,42 +40,44 @@ describe('Role API', (done) => {
       });
   });
 
-  after(() => models.Role.sequelize.sync({ force: true }));
+  after(() => models.Role.sequelize.sync({
+    force: true
+  }));
 
-  it('Admin can create a new role that has a unique title', (done) => {
+  it('an admin can create a new role which has a unique title', (done) => {
     request(app)
       .post('/roles')
       .set('Authorization', authToken)
       .send(fakeData.testRole)
       .expect(201)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('New Role Created');
+      .end((err, res) => {
+        expect(res.body.message).to.equal('New Role Created');
         if (err) return done(err);
         done();
       });
   });
 
-  it('Admin cannot create a new role without a role title', (done) => {
+  it('an admin cannot create a new role without a role title', (done) => {
     request(app)
       .post('/roles')
       .set('Authorization', authToken)
       .send(fakeData.testRole)
       .expect(400)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('Roles require unique titles.');
+      .end((err, res) => {
+        expect(res.body.message).to.equal('Roles require unique titles.');
         if (err) return done(err);
         done();
       });
   });
 
-  it('Non-admin can not create a new role', (done) => {
+  it('a non-admin cannot create a new role', (done) => {
     request(app)
       .post('/roles')
       .set('Authorization', regularToken)
       .send(fakeData.testRole1)
-      .expect(401)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('Unauthorised User');
+      .expect(403)
+      .end((err, res) => {
+        expect(res.body.message).to.equal('Unauthorised User');
         if (err) return done(err);
         done();
       });
@@ -86,21 +88,21 @@ describe('Role API', (done) => {
       .get('/roles')
       .set('Authorization', authToken)
       .expect(200)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('Roles Found');
+      .end((err, res) => {
+        expect(res.body.message).to.equal('Roles Found');
         expect((res.body.roles).length).to.equal(3);
         if (err) return done(err);
         done();
       });
   });
 
-  it('roles can not be viewed by regular users', (done) => {
+  it('roles cannot be viewed by regular users', (done) => {
     request(app)
       .get('/roles')
       .set('Authorization', regularToken)
-      .expect(401)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('Unauthorised User');
+      .expect(403)
+      .end((err, res) => {
+        expect(res.body.message).to.equal('Unauthorised User');
         if (err) return done(err);
         done();
       });
@@ -111,15 +113,16 @@ describe('Role API', (done) => {
       .get('/roles')
       .set('Authorization', authToken)
       .expect(200)
-      .end(function (err, res) {
-        expect(res.body.message).to.equals('Roles Found');
+      .end((err, res) => {
+        expect(res.body.message).to.equal('Roles Found');
         expect(res.body.roles[0].roleTitle).to.equal('admin');
         expect(res.body.roles[1].roleTitle).to.equal('regular');
         if (err) return done(err);
         done();
       });
   });
-  it('ensures that a non admin role can be updated', (done) => {
+
+  it('ensures that a non-admin role can be updated', (done) => {
     request(app)
       .put(`/roles/${regRoleId}`)
       .set('Authorization', authToken)
@@ -127,73 +130,93 @@ describe('Role API', (done) => {
         roleTitle: 'reviewer'
       })
       .expect(201)
-      .end(function (err, res) {
+      .end((err, res) => {
         expect(res.body.message).to.equal('Sucessfully Updated');
         expect(res.body.updatedRole.roleTitle).to.equal('reviewer');
         if (err) return done(err);
         done();
       });
   });
-  it('ensures that a admin role can not be updated', (done) => {
+
+  it('ensures that an admin role cannot be updated', (done) => {
     request(app)
       .put(`/roles/${adminRoleId}`)
       .set('Authorization', authToken)
       .send({
         roleTitle: 'reviewer'
       })
-      .expect(401)
-      .end(function (err, res) {
-        expect(res.body.message).to.equal('Admin roleTitle can not be updated');
+      .expect(403)
+      .end((err, res) => {
+        expect(res.body.message).to.equal('Admin roleTitle cannot be updated');
         if (err) return done(err);
         done();
       });
   });
-  it('provided feedback for a role that can not be updated', (done) => {
-   request(app)
+
+  it('provide feedback for a role that cannot be updated', (done) => {
+    request(app)
       .put('/roles/10')
       .set('Authorization', authToken)
       .send({
         roleTitle: 'reviewer'
       })
       .expect(404)
-      .end(function (err, res) {
+      .end((err, res) => {
         expect(res.body.message).to.equal('Role with id: 10 not found');
         if (err) return done(err);
         done();
       });
   });
-  it('ensures that a non admin role can be deleted', (done) => {
+
+  it('ensures a non-admin cannot update a role', (done) => {
+    request(app)
+      .put(`/roles/${regRoleId}`)
+      .set('Authorization', regularToken)
+      .send({
+        roleTitle: 'reviewer'
+      })
+      .expect(403)
+      .end((err, res) => {
+        expect(res.body.message).to.equal('Unauthorised User');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('ensures that a non-admin role can be deleted', (done) => {
     request(app)
       .delete(`/roles/${regRoleId}`)
       .set('Authorization', authToken)
       .expect(200)
-      .end(function (err, res) {
+      .end((err, res) => {
         expect(res.body.message).to.equal('Successfully Deleted');
         if (err) return done(err);
         done();
       });
   });
-   it('provided feedback for a role that can not be deleted', (done) => {
-   request(app)
+
+  it('provides feedback for a role that cannot be deleted', (done) => {
+    request(app)
       .delete('/roles/10')
       .set('Authorization', authToken)
       .expect(404)
-      .end(function (err, res) {
+      .end((err, res) => {
         expect(res.body.message).to.equal('Role with id: 10 not found');
         if (err) return done(err);
         done();
       });
   });
-  it('ensures that a admin role can not be deleted', (done) => {
+
+  it('ensures that a admin role cannot be deleted', (done) => {
     request(app)
       .delete(`/roles/${adminRoleId}`)
       .set('Authorization', authToken)
       .send({
         roleTitle: 'reviewer'
       })
-      .expect(401)
-      .end(function (err, res) {
-        expect(res.body.message).to.equal('Admin can not be deleted');
+      .expect(403)
+      .end((err, res) => {
+        expect(res.body.message).to.equal('Admin cannot be deleted');
         if (err) return done(err);
         done();
       });
