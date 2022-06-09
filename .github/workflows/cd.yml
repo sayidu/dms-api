@@ -22,8 +22,20 @@ jobs:
     concurrency: staging_environment
     steps:
     - name: Determine Deployment Environment
-      id: environment checks
-      f: ${{ startsWith(github_ref, 'stag')
+      id: environment-checks
+      if: ${{ startsWith(github.event.release.tag, 'stag') }}
       run: |
-        echo "STAGING_ENV=release/${{ GITHUB_REF }}" >> $STAGING_ENV
-   
+        echo "STAGING_ENV=staging" >> $STAGING_ENV
+    - name: Confirm that env was set
+      id: env-checks
+      run: |
+        echo "=========="
+        echo $STAGING_ENV
+        echo  ${{ github.github_ref }}
+        echo  ${{ github.github_sha }}
+        echo "========== Release"
+        echo  ${{ github.event.release.name }} 
+        echo  ${{ github.event.release.tagName }} 
+        echo  ${{ github.event.release.tag }} 
+        echo "========== Release body"
+        echo  ${{ github.event.release.body }} 
