@@ -1,0 +1,29 @@
+
+# CICD Steps
+# 1. Build the image using Docker
+# 2. Tag and push the image to ECR
+  # tag optional, only on main
+# 3. Run Migration, on failure exit.
+# 4. Update the ECS task definition(web + worker), if 3 succeeds
+
+name: Deploy to ECR
+on:
+  release: 
+    types: [published]
+
+## Request access for this to be added to Github secrets
+# To do: secrets go into github settings, rotate the secrets the first. 
+env: 
+  STAGING_ENV: true
+jobs:
+  build:
+    name: Build Image
+    runs-on: ubuntu-latest
+    concurrency: staging_environment
+    steps:
+    - name: Determine Deployment Environment
+      id: environment checks
+      f: ${{ startsWith(github_ref, 'stag')
+      run: |
+        echo "STAGING_ENV=release/${{ GITHUB_REF }}" >> $STAGING_ENV
+   
