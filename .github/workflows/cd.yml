@@ -13,8 +13,6 @@ on:
 
 ## Request access for this to be added to Github secrets
 # To do: secrets go into github settings, rotate the secrets the first. 
-env: 
-  STAGING_ENV: true
 jobs:
   build:
     name: Build Image
@@ -22,8 +20,21 @@ jobs:
     concurrency: staging_environment
     steps:
     - name: Determine Deployment Environment
-      id: environment checks
-      f: ${{ startsWith(github_ref, 'stag')
+      id: environment-checks
+      if: ${{ startsWith(github.event.release.tag_name, 'stag') }}
       run: |
-        echo "STAGING_ENV=release/${{ GITHUB_REF }}" >> $STAGING_ENV
-   
+        echo "GITHUB_SHA_SHORT=staging" >> $GITHUB_ENV
+    - name: Confirm that env was set
+      id: env-checks
+      run: |
+        echo "=========="
+        echo $GITHUB_SHA_SHORT
+        echo "==========sha"
+        echo ${{ env.GITHUB_SHA_SHORT }}
+        echo  ${{ github.github_ref }}
+        echo  ${{ github.github_sha }}
+        echo "========== Release"
+        echo  ${{ github.event.release.name }} 
+        echo  ${{ github.event.release.tag_name }} 
+        echo "========== Release body"
+        echo  ${{ github.event.release.body }} 
