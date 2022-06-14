@@ -13,8 +13,10 @@ on:
   release: 
     types: [published]
 
-## Request access for this to be added to Github secrets
-# To do: secrets go into github settings, rotate the secrets the first. 
+concurrency:
+  group: environment-${{ github.event_name }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build Image
