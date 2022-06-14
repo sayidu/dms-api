@@ -8,6 +8,8 @@
 
 name: Deploy to ECR
 on:
+  pull_request:
+    types: [labeled]
   release: 
     types: [published]
 
@@ -16,8 +18,8 @@ on:
 jobs:
   build:
     name: Build Image
+    if: ${{ github.event.label.name == 'release' }}
     runs-on: ubuntu-latest
-    concurrency: staging_environment
     steps:
     - name: Determine Deployment Environment
       id: environment-checks
@@ -30,11 +32,11 @@ jobs:
         echo "=========="
         echo $GITHUB_SHA_SHORT
         echo "==========sha"
-        echo ${{ env.GITHUB_SHA_SHORT }}
-        echo  ${{ github.github_ref }}
-        echo  ${{ github.github_sha }}
-        echo "========== Release"
-        echo  ${{ github.event.release.name }} 
-        echo  ${{ github.event.release.tag_name }} 
-        echo "========== Release body"
-        echo  ${{ github.event.release.body }} 
+  develop:
+    name: Develop
+    runs-on: ubuntu-latest
+    steps:
+    - name: Develop Environment
+      id: t-checks
+      run: echo ${{ needs.build.outputs.firstword }}
+    
