@@ -1,0 +1,15 @@
+name: "Composite action to read env variables"
+description: "Update env variables in /variables"
+inputs:
+  filePath:
+    required: true
+    description: "path for env files"
+    default: ./.github/variables*
+
+runs:
+  using: "composite"
+  steps:
+    - name: Loads env variables to github env
+      shell: pwsh
+      run: |
+        Get-Content ${{ inputs.filePath }} >> $Env:GITHUB_ENV

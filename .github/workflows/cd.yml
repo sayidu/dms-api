@@ -23,11 +23,14 @@ jobs:
     if: ${{ github.event.label.name == 'deploy' || github.event_name == 'release' }}
     runs-on: ubuntu-latest
     steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
     - name: Determine Deployment Environment
       id: environment-checks
-      if: ${{ startsWith(github.event.release.tag_name, 'stag') }}
-      run: |
-        echo "GITHUB_SHA_SHORT=staging" >> $GITHUB_ENV
+      uses: ./.github/envs
+      with:
+        filePath: ./.github/envs/staging/variables.env
     - name: Confirm that env was set
       id: env-checks
       run: |
